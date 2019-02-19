@@ -7,32 +7,72 @@
 import pygame, sys, os
 from pygame.locals import *
 
+# Movimientos
 QUIETO = 0
 IZQUIERDA = 1
 DERECHA = 2
-SALTO = 3
-# -------------------------------------------------
-# Funciones auxiliares
-# -------------------------------------------------
+ARRIBA = 3
+ABAJO = 4
 
-# El colorkey es es color que indicara la transparencia
-#  Si no se usa, no habra transparencia
-#  Si se especifica -1, el color de transparencia sera el del pixel (0,0)
-#  Si se especifica un color, ese sera la transparencia
-def load_image(name, colorkey=None):
-    fullname = os.path.join('imagenes', name)
-    try:
-        image = pygame.image.load(fullname)
-    except pygame.error as message:
-        print ('Cannot load image:'), fullname
-        raise SystemExit(message)
-    image = image.convert()
-    if colorkey is not None:
-        if colorkey is -1:
-            colorkey = image.get_at((0,0))
-        image.set_colorkey(colorkey, RLEACCEL)
-    return image
+#Posturas
+SPRITE_QUIETO = 0
+SPRITE_ANDANDO = 1
+SPRITE_SALTANDO = 2
 
+VELOCIDAD_JUGADOR = 0.1 # Pixeles por milisegundo
+VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
+RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
+                              # debería de ser un valor distinto para cada postura
+
+# -------------------------------------------------
+# Clase GestorRecursos
+
+# En este caso se implementa como una clase vacía, solo con métodos de clase
+class GestorRecursos(object):
+    recursos = {}
+            
+    @classmethod
+    def CargarImagen(cls, nombre, colorkey=None):
+        # Si el nombre de archivo está entre los recursos ya cargados
+        if nombre in cls.recursos:
+            # Se devuelve ese recurso
+            return cls.recursos[nombre]
+        # Si no ha sido cargado anteriormente
+        else:
+            # Se carga la imagen indicando la carpeta en la que está
+            fullname = os.path.join('imagenes', nombre)
+            try:
+                imagen = pygame.image.load(fullname)
+            except (pygame.error, message) as error:
+                print ('Cannot load image:', fullname)
+                raise (SystemExit, message)
+            imagen = imagen.convert()
+            if colorkey is not None:
+                if colorkey is -1:
+                    colorkey = imagen.get_at((0,0))
+                imagen.set_colorkey(colorkey, RLEACCEL)
+            # Se almacena
+            cls.recursos[nombre] = imagen
+            # Se devuelve
+            return imagen
+    
+    @classmethod
+    def CargarArchivoCoordenadas(cls, nombre):
+        # Si el nombre de archivo está entre los recursos ya cargados
+        if nombre in cls.recursos:
+            # Se devuelve ese recurso
+            return cls.recursos[nombre]
+        # Si no ha sido cargado anteriormente
+        else:
+            # Se carga el recurso indicando el nombre de su carpeta
+            fullname = os.path.join('imagenes', nombre)
+            pfile=open(fullname,'r')
+            datos=pfile.read()
+            pfile.close()
+            # Se almacena
+            cls.recursos[nombre] = datos
+            # Se devuelve
+            return datos
 # -------------------------------------------------
 # Clases de los objetos del juego
 # -------------------------------------------------
@@ -44,65 +84,141 @@ class Jugador(pygame.sprite.Sprite):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self);
         # Se carga la hoja
-        self.hoja = load_image('MikeSprite.png',-1)
+        self.hoja = GestorRecursos.CargarImagen('MikeSprite.png',-1)
         self.hoja = self.hoja.convert_alpha()
-        # El rectangulo y la posicion que tendra
-        self.rect = pygame.Rect((12,25), (40, 60))
-        self.posicionx = 100
-        self.posiciony = 100
+        # El movimiento que esta realizando
+        self.movimiento = QUIETO
+        # Lado hacia el que esta mirando
+        self.mirando = IZQUIERDA
+
         # El movimiento que esta realizando
         self.movimiento = QUIETO
 
         # Leemos las coordenadas de un archivo de texto
-        pfile=open('imagenes/coordenadas.txt','r')
-        datos=pfile.read()
-        pfile.close()
+        datos = GestorRecursos.CargarArchivoCoordenadas('coordenadas.txt')
         datos = datos.split()
-        self.numPostura = 0;
+        self.numPostura = 1;
         self.numImagenPostura = 0;
         cont = 0;
-        numImagenes = [6, 11]
+        numImagenes = [6,11,2]
         self.coordenadasHoja = [];
+        #for linea in range(0, n): para n movimientos 
         for linea in range(0, 2):
             self.coordenadasHoja.append([])
             tmp = self.coordenadasHoja[linea]
             for postura in range(1, numImagenes[linea]+1):
                 tmp.append(pygame.Rect((int(datos[cont]), int(datos[cont+1])), (int(datos[cont+2]), int(datos[cont+3]))))
                 cont += 4
+        
+        # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
+        self.retardoMovimiento = 0;
 
+        # En que postura esta inicialmente
+        self.numPostura = QUIETO
 
-    def dibujar(self, pantalla):
-        #
-        # Parametros de blit:
-        #  Imagen
-        #  Posicion en la pantalla
-        #  Rectangulo dentro de la imagen
-        pantalla.blit(self.hoja, (self.posicionx, self.posiciony), self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+        # La posicion inicial del Sprite
+        self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
 
-    def mover(self, direccion):
-        self.movimiento = direccion
+         # La posicion x e y que ocupa
+        self.posicionx = 300
+        self.posiciony = 300
+        self.rect.left = self.posicionx
+        self.rect.bottom = self.posiciony
+        # Velocidad en el eje y (para los saltos)
+        #  En el eje x se utilizaria si hubiese algun tipo de inercia
+        self.velocidady = 0
 
-    def update(self):
-        # Si vamos a la izquierda
-        if self.movimiento == IZQUIERDA:
-            # Actualizamos la posicion
-            self.posicionx -= 2
-            # Actualizamos la imagen a mostrar
-            self.numImagenPostura += 2
+        # Y actualizamos la postura del Sprite inicial, llamando al metodo correspondiente
+        self.actualizarPostura()
+    
+    def actualizarPostura(self):
+        self.retardoMovimiento -= 1
+        # Miramos si ha pasado el retardo para dibujar una nueva postura
+        if (self.retardoMovimiento < 0):
+            self.retardoMovimiento = RETARDO_ANIMACION_JUGADOR
+            # Si ha pasado, actualizamos la postura
+            self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
                 self.numImagenPostura = 0;
-            # Su siguiente movimiento (si no se pulsa mas) sera estar quieto
-            self.movimiento = QUIETO
-        # Si vamos a la derecha
-        elif self.movimiento == DERECHA:
-            # Actualizamos la posicion
-            self.posicionx += 2
-            # Actualizamos la imagen a mostrar
-            self.numImagenPostura -= 2
             if self.numImagenPostura < 0:
                 self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
-            # Su siguiente movimiento (si no se pulsa mas) sera estar quieto
+            self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+
+            # Si esta mirando a la izquiera, cogemos la porcion de la hoja
+            if self.mirando == DERECHA:
+                self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+            #  Si no, si mira a la derecha, invertimos esa imagen
+            elif self.mirando == IZQUIERDA:
+                self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+    
+    def mover(self,teclasPulsadas, arriba, abajo, izquierda, derecha):
+
+        # Indicamos la acción a realizar segun la tecla pulsada para el jugador
+        if teclasPulsadas[arriba]:
+            # Si estamos en el aire y han pulsado arriba, ignoramos este movimiento
+            if self.numPostura == SPRITE_SALTANDO:
+                self.movimiento = QUIETO
+            else:
+                self.movimiento = ARRIBA
+        elif teclasPulsadas[izquierda]:
+            self.movimiento = IZQUIERDA
+        elif teclasPulsadas[derecha]:
+            self.movimiento = DERECHA
+        else:
             self.movimiento = QUIETO
+
+    def update(self, tiempo):
+        # Si vamos a la izquierda
+        if self.movimiento == IZQUIERDA:
+            # Si no estamos en el aire, la postura actual sera estar caminando
+            if not self.numPostura == SPRITE_SALTANDO:
+                self.numPostura = SPRITE_ANDANDO
+            # Esta mirando a la izquierda
+            self.mirando = IZQUIERDA
+            # Actualizamos la posicion
+            self.posicionx -= VELOCIDAD_JUGADOR * tiempo
+            self.rect.left = self.posicionx
+        # Si vamos a la derecha
+        elif self.movimiento == DERECHA:
+            # Si no estamos en el aire, la postura actual sera estar caminando
+            if not self.numPostura == SPRITE_SALTANDO:
+                self.numPostura = SPRITE_ANDANDO
+            # Esta mirando a la derecha
+            self.mirando = DERECHA
+            # Actualizamos la posicion
+            self.posicionx += VELOCIDAD_JUGADOR * tiempo
+            self.rect.left = self.posicionx
+        # Si estamos saltando
+        elif self.movimiento == ARRIBA:
+            # La postura actual sera estar saltando
+            self.numPostura = SPRITE_SALTANDO
+            # Le imprimimos una velocidad en el eje y
+            self.velocidady = VELOCIDAD_SALTO_JUGADOR
+        # Si no se ha pulsado ninguna tecla
+        elif self.movimiento == QUIETO:
+            # Si no estamos saltando, la postura actual será estar quieto
+            if not self.numPostura == SPRITE_SALTANDO:
+                self.numPostura = SPRITE_QUIETO
+
+        # Si estamos en el aire
+        if self.numPostura == SPRITE_SALTANDO:
+            # Actualizamos la posicion
+            self.posiciony -= self.velocidady * tiempo
+            # Si llegamos a la posicion inferior, paramos de caer y lo ponemos como quieto
+            if (self.posiciony>300):
+                self.numPostura = SPRITE_QUIETO
+                self.posiciony = 300
+                self.velovidady = 0
+            # Si no, aplicamos el efecto de la gravedad
+            else:
+                self.velocidady -= 0.004
+            # Nos ponemos en esa posicion en el eje y
+            self.rect.bottom = self.posiciony
+
+        # Actualizamos la imagen a mostrar
+        self.actualizarPostura()
+        return
+        
 
 
 
@@ -127,11 +243,14 @@ def main():
     # Creamos el objeto jugador
     jugador = Jugador()
 
+    # Creamos el grupo de Sprites de jugadores
+    grupoJugadores = pygame.sprite.Group( jugador)
+
     # El bucle de eventos
     while True:
 
         # Hacemos que el reloj espere a un determinado fps
-        reloj.tick(60)
+        tiempo_pasado = reloj.tick(60)
 
         for event in pygame.event.get():
 
@@ -139,6 +258,7 @@ def main():
                 pygame.quit()
                 sys.exit()
 
+         # Miramos que teclas se han pulsado
         teclasPulsadas = pygame.key.get_pressed()
 
         # Si la tecla es Escape
@@ -147,25 +267,19 @@ def main():
             pygame.quit()
             sys.exit()
 
-        # Indicamos la acción a realizar segun la tecla pulsada
-        elif teclasPulsadas[K_LEFT]:
-            jugador.mover(IZQUIERDA)
-        elif teclasPulsadas[K_RIGHT]:
-            jugador.mover(DERECHA)
-        elif teclasPulsadas[K_UP]:
-            jugador.mover(SALTO)
+
+        # Indicamos la acción a realizar segun la tecla pulsada para cada jugador
+        jugador.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT)
 
 
-        # Actualizamos el jugador
-        jugador.update()
-
-
+        # Actualizamos los jugadores actualizando el grupo
+        grupoJugadores.update(tiempo_pasado)
 
         # Dibujar el fondo de color
         pantalla.fill((133,133,133))
 
-        # Dibujar el Sprite
-        jugador.dibujar(pantalla)
+        # Dibujar el grupo de Sprites
+        grupoJugadores.draw(pantalla)
 
         # Actualizar la pantalla
         pygame.display.update()
