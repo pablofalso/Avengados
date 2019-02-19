@@ -23,9 +23,9 @@ def load_image(name, colorkey=None):
     fullname = os.path.join('imagenes', name)
     try:
         image = pygame.image.load(fullname)
-    except pygame.error, message:
-        print 'Cannot load image:', fullname
-        raise SystemExit, message
+    except pygame.error as message:
+        print ('Cannot load image:'), fullname
+        raise SystemExit(message)
     image = image.convert()
     if colorkey is not None:
         if colorkey is -1:
@@ -61,7 +61,7 @@ class Jugador(pygame.sprite.Sprite):
         self.numPostura = 0;
         self.numImagenPostura = 0;
         cont = 0;
-        numImagenes = [6, 12]
+        numImagenes = [6, 11]
         self.coordenadasHoja = [];
         for linea in range(0, 2):
             self.coordenadasHoja.append([])
