@@ -1,36 +1,41 @@
 # -*- coding: utf-8 -*-
 
+# -------------------------------------------------
 # Importar las librerías
-import pygame, sys
+# -------------------------------------------------
+
+import pygame, sys, os
 from pygame.locals import *
 
-# Inicializar la librería de pygame
-pygame.init()
+QUIETO = 0
+IZQUIERDA = 1
+DERECHA = 2
+SALTO = 3
+# -------------------------------------------------
+# Funciones auxiliares
+# -------------------------------------------------
 
-BLANCO = (255,255,255)
+# El colorkey es es color que indicara la transparencia
+#  Si no se usa, no habra transparencia
+#  Si se especifica -1, el color de transparencia sera el del pixel (0,0)
+#  Si se especifica un color, ese sera la transparencia
+def load_image(name, colorkey=None):
+    fullname = os.path.join('imagenes', name)
+    try:
+        image = pygame.image.load(fullname)
+    except pygame.error, message:
+        print 'Cannot load image:', fullname
+        raise SystemExit, message
+    image = image.convert()
+    if colorkey is not None:
+        if colorkey is -1:
+            colorkey = image.get_at((0,0))
+        image.set_colorkey(colorkey, RLEACCEL)
+    return image
 
-# Creamos la pantalla
-pantalla = pygame.display.set_mode((800,600))
-
-# Bucle infinito
-while True:
-
-        # Para cada evento posible
-        for evento in pygame.event.get():
-
-                # Si el evento es la pulsación de la tecla Escape
-                if evento.type == KEYDOWN and evento.key == K_ESCAPE:
-                        # Se sale del programa
-                        pygame.quit()
-                        sys.exit()
-
-
-        # Rellenamos la pantalla de color negro
-        pantalla.fill((0,0,0))
-
-
-        # Actualizamos la pantalla
-        pygame.display.update()
+# -------------------------------------------------
+# Clases de los objetos del juego
+# -------------------------------------------------
 
 class Jugador(pygame.sprite.Sprite):
     "Jugador"
@@ -38,16 +43,67 @@ class Jugador(pygame.sprite.Sprite):
     def __init__(self):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self);
-        # Se carga la imagen
-        self.imagen = load_image('Jugador.png', -1)
-        self.imagen = self.imagen.convert_alpha()
+        # Se carga la hoja
+        self.hoja = load_image('MikeSprite.png',-1)
+        self.hoja = self.hoja.convert_alpha()
         # El rectangulo y la posicion que tendra
-        self.rect = self.imagen.get_rect()
-        self.rect.topleft = (100,100)
+        self.rect = pygame.Rect((12,25), (40, 60))
+        self.posicionx = 100
+        self.posiciony = 100
+        # El movimiento que esta realizando
+        self.movimiento = QUIETO
+
+        # Leemos las coordenadas de un archivo de texto
+        pfile=open('imagenes/coordenadas.txt','r')
+        datos=pfile.read()
+        pfile.close()
+        datos = datos.split()
+        self.numPostura = 0;
+        self.numImagenPostura = 0;
+        cont = 0;
+        numImagenes = [6, 12]
+        self.coordenadasHoja = [];
+        for linea in range(0, 2):
+            self.coordenadasHoja.append([])
+            tmp = self.coordenadasHoja[linea]
+            for postura in range(1, numImagenes[linea]+1):
+                tmp.append(pygame.Rect((int(datos[cont]), int(datos[cont+1])), (int(datos[cont+2]), int(datos[cont+3]))))
+                cont += 4
 
 
     def dibujar(self, pantalla):
-        pantalla.blit(self.imagen, self.rect)
+        #
+        # Parametros de blit:
+        #  Imagen
+        #  Posicion en la pantalla
+        #  Rectangulo dentro de la imagen
+        pantalla.blit(self.hoja, (self.posicionx, self.posiciony), self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+
+    def mover(self, direccion):
+        self.movimiento = direccion
+
+    def update(self):
+        # Si vamos a la izquierda
+        if self.movimiento == IZQUIERDA:
+            # Actualizamos la posicion
+            self.posicionx -= 2
+            # Actualizamos la imagen a mostrar
+            self.numImagenPostura += 2
+            if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
+                self.numImagenPostura = 0;
+            # Su siguiente movimiento (si no se pulsa mas) sera estar quieto
+            self.movimiento = QUIETO
+        # Si vamos a la derecha
+        elif self.movimiento == DERECHA:
+            # Actualizamos la posicion
+            self.posicionx += 2
+            # Actualizamos la imagen a mostrar
+            self.numImagenPostura -= 2
+            if self.numImagenPostura < 0:
+                self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
+            # Su siguiente movimiento (si no se pulsa mas) sera estar quieto
+            self.movimiento = QUIETO
+
 
 
 # -------------------------------------------------
@@ -68,11 +124,8 @@ def main():
     # Poner el título de la ventana
     pygame.display.set_caption('Ejemplo de uso de Sprites')
 
-    # Cargar la imagen del hombre
+    # Creamos el objeto jugador
     jugador = Jugador()
-
-    # Variable que controla la posición del Sprite (horizontal)
-    pos = 100
 
     # El bucle de eventos
     while True:
@@ -86,17 +139,27 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        # Modificar posición en función de la tecla pulsada
         teclasPulsadas = pygame.key.get_pressed()
-        if teclasPulsadas[K_LEFT]:
-            jugador.rect.centerx -= 1
-        if teclasPulsadas[K_RIGHT]:
-            jugador.rect.centerx += 1
+
         # Si la tecla es Escape
         if teclasPulsadas[K_ESCAPE]:
             # Se sale del programa
             pygame.quit()
             sys.exit()
+
+        # Indicamos la acción a realizar segun la tecla pulsada
+        elif teclasPulsadas[K_LEFT]:
+            jugador.mover(IZQUIERDA)
+        elif teclasPulsadas[K_RIGHT]:
+            jugador.mover(DERECHA)
+        elif teclasPulsadas[K_UP]:
+            jugador.mover(SALTO)
+
+
+        # Actualizamos el jugador
+        jugador.update()
+
+
 
         # Dibujar el fondo de color
         pantalla.fill((133,133,133))
