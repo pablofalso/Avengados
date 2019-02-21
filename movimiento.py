@@ -17,13 +17,17 @@ ABAJO = 4
 #Posturas
 SPRITE_QUIETO = 0
 SPRITE_ANDANDO = 1
-SPRITE_SALTANDO = 2
+SPRITE_SALTANDO_SUBIENDO = 2
+SPRITE_SALTANDO_BAJANDO = 3
+SPRITE_SALTANDO_SUELO = 4
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
 RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
                               # debería de ser un valor distinto para cada postura
 
+PRIMER_SALTO = 0
+SEGUNDO_SALTO = 1
 # -------------------------------------------------
 # Clase GestorRecursos
 
@@ -97,10 +101,10 @@ class Jugador(pygame.sprite.Sprite):
         self.numPostura = 1;
         self.numImagenPostura = 0;
         cont = 0;
-        numImagenes = [6,12,5]
+        numImagenes = [6,11,2,2,1]
         self.coordenadasHoja = [];
         #for linea in range(0, n): para n movimientos
-        for linea in range(0, 3):
+        for linea in range(0, 5):
             self.coordenadasHoja.append([])
             tmp = self.coordenadasHoja[linea]
             for postura in range(1, numImagenes[linea]+1):
@@ -112,6 +116,9 @@ class Jugador(pygame.sprite.Sprite):
 
         # En que postura esta inicialmente
         self.numPostura = QUIETO
+
+        # Asignar un valor cualquiera a la variable doble salto (se sobreescribe la primera vez que se salta)
+        self.dobleSalto = PRIMER_SALTO
 
         # La posicion inicial del Sprite
         self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
@@ -150,11 +157,16 @@ class Jugador(pygame.sprite.Sprite):
     def mover(self,teclasPulsadas, arriba, abajo, izquierda, derecha):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         if teclasPulsadas[arriba]:
-            # Si estamos en el aire y han pulsado arriba, ignoramos este movimiento
-            if self.numPostura == SPRITE_SALTANDO:
-                self.movimiento = QUIETO
+            # Si estamos en el aire y han pulsado arriba, si es el primer salto, se repite, sino, lo ignoramos
+            if (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+                if self.dobleSalto == PRIMER_SALTO:
+                    self.movimiento = ARRIBA
+                    self.dobleSalto = SEGUNDO_SALTO
+                else:
+                    self.movimiento = QUIETO
             else:
                 self.movimiento = ARRIBA
+                self.dobleSalto = PRIMER_SALTO
         elif teclasPulsadas[izquierda]:
             self.movimiento = IZQUIERDA
         elif teclasPulsadas[derecha]:
@@ -166,7 +178,7 @@ class Jugador(pygame.sprite.Sprite):
         # Si vamos a la izquierda
         if self.movimiento == IZQUIERDA:
             # Si no estamos en el aire, la postura actual sera estar caminando
-            if not self.numPostura == SPRITE_SALTANDO:
+            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
                 self.numPostura = SPRITE_ANDANDO
             # Esta mirando a la izquierda
             self.mirando = IZQUIERDA
@@ -176,7 +188,7 @@ class Jugador(pygame.sprite.Sprite):
         # Si vamos a la derecha
         elif self.movimiento == DERECHA:
             # Si no estamos en el aire, la postura actual sera estar caminando
-            if not self.numPostura == SPRITE_SALTANDO:
+            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
                 self.numPostura = SPRITE_ANDANDO
             # Esta mirando a la derecha
             self.mirando = DERECHA
@@ -186,28 +198,29 @@ class Jugador(pygame.sprite.Sprite):
         # Si estamos saltando
         elif self.movimiento == ARRIBA:
             # La postura actual sera estar saltando
-            self.numPostura = SPRITE_SALTANDO
+            self.numPostura = SPRITE_SALTANDO_SUBIENDO
             # Le imprimimos una velocidad en el eje y
             self.velocidady = VELOCIDAD_SALTO_JUGADOR
         # Si no se ha pulsado ninguna tecla
         elif self.movimiento == QUIETO:
             # Si no estamos saltando, la postura actual será estar quieto
-            if not self.numPostura == SPRITE_SALTANDO:
+            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
                 self.numPostura = SPRITE_QUIETO
 
         # Si estamos en el aire
-        if self.numPostura == SPRITE_SALTANDO:
+        if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
             # Actualizamos la posicion
             self.posiciony -= self.velocidady * tiempo
-            self.posicionx -= 0.05 * tiempo
             # Si llegamos a la posicion inferior, paramos de caer y lo ponemos como quieto
             if (self.posiciony>300):
-                self.numPostura = SPRITE_QUIETO
-                #self.posiciony = 300
-                self.velovidady = 0
+                self.numPostura = SPRITE_SALTANDO_SUELO
+                self.posiciony = 300
+                self.velocidady = 0
             # Si no, aplicamos el efecto de la gravedad
             else:
                 self.velocidady -= 0.004
+                if self.velocidady <= 0:
+                    self.numPostura = SPRITE_SALTANDO_BAJANDO
             # Nos ponemos en esa posicion en el eje y
             self.rect.bottom = self.posiciony
 
