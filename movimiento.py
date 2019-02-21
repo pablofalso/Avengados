@@ -91,9 +91,6 @@ class Jugador(pygame.sprite.Sprite):
         # Lado hacia el que esta mirando
         self.mirando = IZQUIERDA
 
-        # El movimiento que esta realizando
-        self.movimiento = QUIETO
-
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('coordenadas.txt')
         datos = datos.split()
@@ -103,7 +100,7 @@ class Jugador(pygame.sprite.Sprite):
         numImagenes = [6,12,5]
         self.coordenadasHoja = [];
         #for linea in range(0, n): para n movimientos
-        for linea in range(0, 2):
+        for linea in range(0, 3):
             self.coordenadasHoja.append([])
             tmp = self.coordenadasHoja[linea]
             for postura in range(1, numImagenes[linea]+1):
@@ -143,7 +140,6 @@ class Jugador(pygame.sprite.Sprite):
             if self.numImagenPostura < 0:
                 self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
             self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
-
             # Si esta mirando a la izquiera, cogemos la porcion de la hoja
             if self.mirando == DERECHA:
                 self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
@@ -203,10 +199,11 @@ class Jugador(pygame.sprite.Sprite):
         if self.numPostura == SPRITE_SALTANDO:
             # Actualizamos la posicion
             self.posiciony -= self.velocidady * tiempo
+            self.posicionx -= 0.05 * tiempo
             # Si llegamos a la posicion inferior, paramos de caer y lo ponemos como quieto
             if (self.posiciony>300):
                 self.numPostura = SPRITE_QUIETO
-                self.posiciony = 300
+                #self.posiciony = 300
                 self.velovidady = 0
             # Si no, aplicamos el efecto de la gravedad
             else:
@@ -237,7 +234,7 @@ def main():
     reloj = pygame.time.Clock()
 
     # Poner el título de la ventana
-    pygame.display.set_caption('Ejemplo de uso de Sprites')
+    pygame.display.set_caption('Avengados')
 
     # Creamos el objeto jugador
     jugador = Jugador()
