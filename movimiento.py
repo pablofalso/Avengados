@@ -19,7 +19,7 @@ SPRITE_QUIETO = 0
 SPRITE_ANDANDO = 1
 SPRITE_SALTANDO = 2
 
-VELOCIDAD_JUGADOR = 0.1 # Pixeles por milisegundo
+VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
 RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
                               # debería de ser un valor distinto para cada postura
@@ -30,7 +30,7 @@ RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
 # En este caso se implementa como una clase vacía, solo con métodos de clase
 class GestorRecursos(object):
     recursos = {}
-            
+
     @classmethod
     def CargarImagen(cls, nombre, colorkey=None):
         # Si el nombre de archivo está entre los recursos ya cargados
@@ -55,7 +55,7 @@ class GestorRecursos(object):
             cls.recursos[nombre] = imagen
             # Se devuelve
             return imagen
-    
+
     @classmethod
     def CargarArchivoCoordenadas(cls, nombre):
         # Si el nombre de archivo está entre los recursos ya cargados
@@ -100,16 +100,16 @@ class Jugador(pygame.sprite.Sprite):
         self.numPostura = 1;
         self.numImagenPostura = 0;
         cont = 0;
-        numImagenes = [6,11,2]
+        numImagenes = [6,12,5]
         self.coordenadasHoja = [];
-        #for linea in range(0, n): para n movimientos 
+        #for linea in range(0, n): para n movimientos
         for linea in range(0, 2):
             self.coordenadasHoja.append([])
             tmp = self.coordenadasHoja[linea]
             for postura in range(1, numImagenes[linea]+1):
                 tmp.append(pygame.Rect((int(datos[cont]), int(datos[cont+1])), (int(datos[cont+2]), int(datos[cont+3]))))
                 cont += 4
-        
+
         # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
         self.retardoMovimiento = 0;
 
@@ -130,7 +130,7 @@ class Jugador(pygame.sprite.Sprite):
 
         # Y actualizamos la postura del Sprite inicial, llamando al metodo correspondiente
         self.actualizarPostura()
-    
+
     def actualizarPostura(self):
         self.retardoMovimiento -= 1
         # Miramos si ha pasado el retardo para dibujar una nueva postura
@@ -150,9 +150,8 @@ class Jugador(pygame.sprite.Sprite):
             #  Si no, si mira a la derecha, invertimos esa imagen
             elif self.mirando == IZQUIERDA:
                 self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
-    
-    def mover(self,teclasPulsadas, arriba, abajo, izquierda, derecha):
 
+    def mover(self,teclasPulsadas, arriba, abajo, izquierda, derecha):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         if teclasPulsadas[arriba]:
             # Si estamos en el aire y han pulsado arriba, ignoramos este movimiento
@@ -218,7 +217,7 @@ class Jugador(pygame.sprite.Sprite):
         # Actualizamos la imagen a mostrar
         self.actualizarPostura()
         return
-        
+
 
 
 
