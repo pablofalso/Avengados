@@ -27,10 +27,13 @@ RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
                               # debería de ser un valor distinto para cada postura
 
 #Para identificar si ya se ha realizado el segundo salto
-PRIMER_SALTO = 0
-SEGUNDO_SALTO = 1
+DOBLE_SALTO_PRIMER_SALTO = 0
+DOBLE_SALTO_SEGUNDO_SALTO = 1
 #Tiempo de diferencia entre el primer y el segundo salto
 DOBLE_SALTO_DELAY = 250
+
+DESBLOQUEADO = 0
+BLOQUEADO = 1
 
 
 # -------------------------------------------------
@@ -122,6 +125,8 @@ class Jugador(pygame.sprite.Sprite):
         # En que postura esta inicialmente
         self.numPostura = QUIETO
 
+        self.dobleSalto_bloqueado = DESBLOQUEADO
+
         # La posicion inicial del Sprite
         self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
 
@@ -161,20 +166,20 @@ class Jugador(pygame.sprite.Sprite):
         if teclasPulsadas[arriba]:
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
-                # Si solo se ha realizado un salto
-                if self.dobleSalto == PRIMER_SALTO:
+                # Si el doble salto esta desbloqueado y solo se ha realizado un salto sin tocar el suelo
+                if self.dobleSalto_bloqueado == DESBLOQUEADO and self.dobleSalto_numSalto == DOBLE_SALTO_PRIMER_SALTO:
                     # Si ha pasado un tiempo minimo, se realiza un segundo salto
-                    if (pygame.time.get_ticks() - self.ultimoSaltoTimer) > DOBLE_SALTO_DELAY:
+                    if (pygame.time.get_ticks() - self.dobleSalto_timer) > DOBLE_SALTO_DELAY:
                         self.movimiento = ARRIBA
-                        self.dobleSalto = SEGUNDO_SALTO
+                        self.dobleSalto_numSalto = DOBLE_SALTO_SEGUNDO_SALTO
                     else:
                         self.movimiento = QUIETO  
                 else:
                     self.movimiento = QUIETO  
             else:
                 self.movimiento = ARRIBA
-                self.dobleSalto = PRIMER_SALTO
-                self.ultimoSaltoTimer = pygame.time.get_ticks()
+                self.dobleSalto_numSalto = DOBLE_SALTO_PRIMER_SALTO
+                self.dobleSalto_timer = pygame.time.get_ticks()
         elif teclasPulsadas[izquierda]:
             self.movimiento = IZQUIERDA
         elif teclasPulsadas[derecha]:
@@ -209,7 +214,7 @@ class Jugador(pygame.sprite.Sprite):
             self.numPostura = SPRITE_SALTANDO_SUBIENDO
             # Le imprimimos una velocidad en el eje y
             self.velocidady = VELOCIDAD_SALTO_JUGADOR
-            if self.dobleSalto == SEGUNDO_SALTO:
+            if self.dobleSalto_numSalto == DOBLE_SALTO_SEGUNDO_SALTO:
                 self.velocidady == VELOCIDAD_SALTO_JUGADOR*2
         # Si no se ha pulsado ninguna tecla
         elif self.movimiento == QUIETO:
@@ -223,7 +228,7 @@ class Jugador(pygame.sprite.Sprite):
             # Si llegamos a la posicion inferior, paramos de caer y lo ponemos como quieto
             if (self.posiciony>300):
                 self.numPostura = SPRITE_SALTANDO_SUELO
-                self.dobleSalto = PRIMER_SALTO
+                self.dobleSalto_numSalto = DOBLE_SALTO_PRIMER_SALTO
                 self.posiciony = 300
                 self.velocidady = 0
             # Si no, aplicamos el efecto de la gravedad
