@@ -19,12 +19,15 @@ SPRITE_QUIETO = 0
 SPRITE_ANDANDO = 1
 SPRITE_SALTANDO_SUBIENDO = 2
 SPRITE_SALTANDO_BAJANDO = 3
-SPRITE_SALTANDO_SUELO = 4
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
 RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
                               # debería de ser un valor distinto para cada postura
+RETARDO_ANIMACION_QUIETO = 10
+RETARDO_ANIMACION_ANDANDO = 7
+RETARDO_ANIMACION_SALTANDO_SUBIENDO = 7
+RETARDO_ANIMACION_SALTANDO_BAJANDO = 7
 
 #Para identificar si ya se ha realizado el segundo salto
 DOBLE_SALTO_PRIMER_SALTO = 0
@@ -146,7 +149,15 @@ class Jugador(pygame.sprite.Sprite):
         self.retardoMovimiento -= 1
         # Miramos si ha pasado el retardo para dibujar una nueva postura
         if (self.retardoMovimiento < 0):
-            self.retardoMovimiento = RETARDO_ANIMACION_JUGADOR
+            if self.numPostura == SPRITE_QUIETO:
+                self.retardoMovimiento = RETARDO_ANIMACION_QUIETO
+            elif self.numPostura == SPRITE_ANDANDO:
+                self.retardoMovimiento = RETARDO_ANIMACION_ANDANDO
+            elif self.numPostura == SPRITE_SALTANDO_SUBIENDO:
+                self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_SUBIENDO
+            elif self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_BAJANDO
+            
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
@@ -214,8 +225,6 @@ class Jugador(pygame.sprite.Sprite):
             self.numPostura = SPRITE_SALTANDO_SUBIENDO
             # Le imprimimos una velocidad en el eje y
             self.velocidady = VELOCIDAD_SALTO_JUGADOR
-            if self.dobleSalto_numSalto == DOBLE_SALTO_SEGUNDO_SALTO:
-                self.velocidady == VELOCIDAD_SALTO_JUGADOR*2
         # Si no se ha pulsado ninguna tecla
         elif self.movimiento == QUIETO:
             # Si no estamos saltando, la postura actual será estar quieto
@@ -227,7 +236,7 @@ class Jugador(pygame.sprite.Sprite):
             self.posiciony -= self.velocidady * tiempo
             # Si llegamos a la posicion inferior, paramos de caer y lo ponemos como quieto
             if (self.posiciony>300):
-                self.numPostura = SPRITE_SALTANDO_SUELO
+                self.numPostura = SPRITE_QUIETO
                 self.dobleSalto_numSalto = DOBLE_SALTO_PRIMER_SALTO
                 self.posiciony = 300
                 self.velocidady = 0
