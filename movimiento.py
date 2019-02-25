@@ -13,12 +13,14 @@ IZQUIERDA = 1
 DERECHA = 2
 ARRIBA = 3
 ABAJO = 4
+ATAQUE = 5
 
 #Posturas
 SPRITE_QUIETO = 0
 SPRITE_ANDANDO = 1
 SPRITE_SALTANDO_SUBIENDO = 2
 SPRITE_SALTANDO_BAJANDO = 3
+ATAQUE_MELEE = 4
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
@@ -112,7 +114,7 @@ class Jugador(pygame.sprite.Sprite):
         self.numPostura = 1
         self.numImagenPostura = 0
         cont = 0
-        numImagenes = [6,11,2,2,1]
+        numImagenes = [6,11,2,2,5]
         self.coordenadasHoja = []
         #for linea in range(0, n): para n movimientos
         for linea in range(0, 5):
@@ -157,7 +159,8 @@ class Jugador(pygame.sprite.Sprite):
                 self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_SUBIENDO
             elif self.numPostura == SPRITE_SALTANDO_BAJANDO:
                 self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_BAJANDO
-            
+            elif self.numPostura == ATAQUE_MELEE:
+                self.retardoMovimiento = 10
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
@@ -172,7 +175,7 @@ class Jugador(pygame.sprite.Sprite):
             elif self.mirando == IZQUIERDA:
                 self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
 
-    def mover(self,teclasPulsadas, arriba, abajo, izquierda, derecha):
+    def mover(self,teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         if teclasPulsadas[arriba]:
             # Si estamos en el aire y han pulsado arriba
@@ -184,9 +187,9 @@ class Jugador(pygame.sprite.Sprite):
                         self.movimiento = ARRIBA
                         self.dobleSalto_numSalto = DOBLE_SALTO_SEGUNDO_SALTO
                     else:
-                        self.movimiento = QUIETO  
+                        self.movimiento = QUIETO
                 else:
-                    self.movimiento = QUIETO  
+                    self.movimiento = QUIETO
             else:
                 self.movimiento = ARRIBA
                 self.dobleSalto_numSalto = DOBLE_SALTO_PRIMER_SALTO
@@ -195,6 +198,8 @@ class Jugador(pygame.sprite.Sprite):
             self.movimiento = IZQUIERDA
         elif teclasPulsadas[derecha]:
             self.movimiento = DERECHA
+        elif teclasPulsadas[ataque_melee]:
+            self.movimiento = ATAQUE
         else:
             self.movimiento = QUIETO
 
@@ -230,6 +235,9 @@ class Jugador(pygame.sprite.Sprite):
             # Si no estamos saltando, la postura actual será estar quieto
             if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
                 self.numPostura = SPRITE_QUIETO
+        elif self.movimiento == ATAQUE:
+            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+                self.numPostura = ATAQUE_MELEE
         # Si estamos en el aire
         if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
             # Actualizamos la posicion
@@ -302,7 +310,7 @@ def main():
 
 
         # Indicamos la acción a realizar segun la tecla pulsada para cada jugador
-        jugador.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT)
+        jugador.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT,K_a)
 
 
         # Actualizamos los jugadores actualizando el grupo
