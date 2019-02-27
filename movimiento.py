@@ -107,7 +107,7 @@ class Jugador(pygame.sprite.Sprite):
         self.movimiento = QUIETO
         # Lado hacia el que esta mirando
         self.mirando = IZQUIERDA
-
+        self.atacando = False
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('coordenadas.txt')
         datos = datos.split()
@@ -160,7 +160,7 @@ class Jugador(pygame.sprite.Sprite):
             elif self.numPostura == SPRITE_SALTANDO_BAJANDO:
                 self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_BAJANDO
             elif self.numPostura == ATAQUE_MELEE:
-                self.retardoMovimiento = 10
+                self.retardoMovimiento = 4
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
@@ -200,6 +200,12 @@ class Jugador(pygame.sprite.Sprite):
             self.movimiento = DERECHA
         elif teclasPulsadas[ataque_melee]:
             self.movimiento = ATAQUE
+            self.inicio_ataque = pygame.time.get_ticks()
+            self.atacando = True
+        elif self.atacando:
+            if (pygame.time.get_ticks() - self.inicio_ataque > 350):
+                self.movimiento = QUIETO
+                self.atacando = False
         else:
             self.movimiento = QUIETO
 
