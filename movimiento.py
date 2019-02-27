@@ -20,7 +20,7 @@ SPRITE_QUIETO = 0
 SPRITE_ANDANDO = 1
 SPRITE_SALTANDO_SUBIENDO = 2
 SPRITE_SALTANDO_BAJANDO = 3
-ATAQUE_MELEE = 4
+SPRITE_ATAQUE_MELEE = 4
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
@@ -159,8 +159,9 @@ class Jugador(pygame.sprite.Sprite):
                 self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_SUBIENDO
             elif self.numPostura == SPRITE_SALTANDO_BAJANDO:
                 self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_BAJANDO
-            elif self.numPostura == ATAQUE_MELEE:
-                self.retardoMovimiento = 10
+            else:
+                self.numPostura = SPRITE_QUIETO
+                self.movimiento = QUIETO
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
@@ -200,7 +201,7 @@ class Jugador(pygame.sprite.Sprite):
             self.movimiento = DERECHA
         elif teclasPulsadas[ataque_melee]:
             self.movimiento = ATAQUE
-        else:
+        elif not (self.movimiento == ATAQUE):
             self.movimiento = QUIETO
 
     def update(self, tiempo):
@@ -237,7 +238,7 @@ class Jugador(pygame.sprite.Sprite):
                 self.numPostura = SPRITE_QUIETO
         elif self.movimiento == ATAQUE:
             if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
-                self.numPostura = ATAQUE_MELEE
+                self.numPostura = SPRITE_ATAQUE_MELEE
         # Si estamos en el aire
         if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
             # Actualizamos la posicion
