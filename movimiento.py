@@ -31,16 +31,6 @@ RETARDO_ANIMACION_ANDANDO = 7
 RETARDO_ANIMACION_SALTANDO_SUBIENDO = 7
 RETARDO_ANIMACION_SALTANDO_BAJANDO = 7
 
-#Para identificar si ya se ha realizado el segundo salto
-DOBLE_SALTO_PRIMER_SALTO = 0
-DOBLE_SALTO_SEGUNDO_SALTO = 1
-#Tiempo de diferencia entre el primer y el segundo salto
-DOBLE_SALTO_DELAY = 250
-
-DESBLOQUEADO = 0
-BLOQUEADO = 1
-
-
 # -------------------------------------------------
 # Clase GestorRecursos
 
@@ -130,7 +120,12 @@ class Jugador(pygame.sprite.Sprite):
         # En que postura esta inicialmente
         self.numPostura = QUIETO
 
-        self.dobleSalto_bloqueado = DESBLOQUEADO
+        # Variables para dobleSalto
+        self.dobleSalto_desbloqueado = True
+        # Es 'True' cuando ya se ha realizado el segundo salto, y se pone a 'False' al tocar el suelo
+        self.dobleSalto_segundoSalto = False
+        # Variable para controlar si se suelta la tecla de salto después de saltar por primera vez
+        self.keyUp_suelta = False
 
         # La posicion inicial del Sprite
         self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
@@ -175,25 +170,21 @@ class Jugador(pygame.sprite.Sprite):
             elif self.mirando == IZQUIERDA:
                 self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
 
-    def mover(self,teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee):
+    def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         if teclasPulsadas[arriba]:
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
-                # Si el doble salto esta desbloqueado y solo se ha realizado un salto sin tocar el suelo
-                if self.dobleSalto_bloqueado == DESBLOQUEADO and self.dobleSalto_numSalto == DOBLE_SALTO_PRIMER_SALTO:
-                    # Si ha pasado un tiempo minimo, se realiza un segundo salto
-                    if (pygame.time.get_ticks() - self.dobleSalto_timer) > DOBLE_SALTO_DELAY:
-                        self.movimiento = ARRIBA
-                        self.dobleSalto_numSalto = DOBLE_SALTO_SEGUNDO_SALTO
-                    else:
-                        self.movimiento = QUIETO
+                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar 
+                # y solo se ha realizado un salto sin tocar el suelo
+                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    self.movimiento = ARRIBA
+                    self.dobleSalto_segundoSalto = True
                 else:
-                    self.movimiento = QUIETO
+                    self.movimiento =  QUIETO
             else:
                 self.movimiento = ARRIBA
-                self.dobleSalto_numSalto = DOBLE_SALTO_PRIMER_SALTO
-                self.dobleSalto_timer = pygame.time.get_ticks()
+                self.keyUp_suelta = False
         elif teclasPulsadas[izquierda]:
             self.movimiento = IZQUIERDA
         elif teclasPulsadas[derecha]:
@@ -251,7 +242,8 @@ class Jugador(pygame.sprite.Sprite):
             # Si llegamos a la posicion inferior, paramos de caer y lo ponemos como quieto
             if (self.posiciony>300):
                 self.numPostura = SPRITE_QUIETO
-                self.dobleSalto_numSalto = DOBLE_SALTO_PRIMER_SALTO
+                # Se actualiza la variable para controlar si se ha realizado el segundo salto
+                self.dobleSalto_segundoSalto = False
                 self.posiciony = 300
                 self.velocidady = 0
             # Si no, aplicamos el efecto de la gravedad
@@ -293,6 +285,9 @@ def main():
     # Creamos el grupo de Sprites de jugadores
     grupoJugadores = pygame.sprite.Group( jugador)
 
+    # Variable para controlar que se ha pulsado la tecla para luego comprobar que se ha soltado
+    keyUp_pulsada = False
+
     # El bucle de eventos
     while True:
 
@@ -313,7 +308,14 @@ def main():
             # Se sale del programa
             pygame.quit()
             sys.exit()
-
+        
+        # Controlamos que para realizar el segundo salto se suelte la tecla de saltar antes de repetir el salto
+        if teclasPulsadas[K_UP]:
+            keyUp_pulsada = True
+        # Una vez se suelta la tecla se actualiza la variable del jugador para que pueda realizar el segundo salto
+        if (not teclasPulsadas[K_UP]) and keyUp_pulsada:
+            keyUp_pulsada = False
+            jugador.keyUp_suelta = True
 
         # Indicamos la acción a realizar segun la tecla pulsada para cada jugador
         jugador.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT,K_a)
