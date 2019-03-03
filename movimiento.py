@@ -175,7 +175,7 @@ class Jugador(pygame.sprite.Sprite):
         if teclasPulsadas[arriba]:
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
-                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar 
+                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
                 # y solo se ha realizado un salto sin tocar el suelo
                 if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
                     self.movimiento = ARRIBA
@@ -308,7 +308,7 @@ def main():
             # Se sale del programa
             pygame.quit()
             sys.exit()
-        
+
         # Controlamos que para realizar el segundo salto se suelte la tecla de saltar antes de repetir el salto
         if teclasPulsadas[K_UP]:
             keyUp_pulsada = True

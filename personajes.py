@@ -115,6 +115,7 @@ class Jugador(pygame.sprite.Sprite):
     def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         if teclasPulsadas[arriba]:
+            self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
                 # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
@@ -141,6 +142,8 @@ class Jugador(pygame.sprite.Sprite):
                 self.atacando = False
         else:
             self.movimiento = QUIETO
+
+
 
     def update(self, tiempo):
         # Si vamos a la izquierda

@@ -44,6 +44,7 @@ class Fase(Escena):
 
         # Creamos los sprites de los jugadores
         self.jugador1 = Jugador()
+        self.jugador1.keyUp_pulsada = False
         self.grupoJugadores = pygame.sprite.Group(self.jugador1)
 
         # Creamos un grupo con los Sprites que se mueven
@@ -53,13 +54,6 @@ class Fase(Escena):
         self.grupoSprites = pygame.sprite.Group(self.jugador1)
 
 
-    # Se actualiza el decorado, realizando las siguientes acciones:
-    #  Se indica para los personajes no jugadores qué movimiento desean realizar según su IA
-    #  Se mueven los sprites dinámicos, todos a la vez
-    #  Se comprueba si hay colision entre algun jugador y algun enemigo
-    #  Se comprueba si algún jugador ha salido de la pantalla, y se actualiza el scroll en consecuencia
-    #     Actualizar el scroll implica tener que desplazar todos los sprites por pantalla
-    #  Se actualiza la posicion del sol y el color del cielo
     def update(self,tiempo):
 
 
@@ -71,14 +65,9 @@ class Fase(Escena):
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)
 
-        # Los Sprites que no se mueven no hace falta actualizarlos,
-        #  si se actualiza el scroll, sus posiciones en pantalla se actualizan más abajo
-        # En cambio, sí haría falta actualizar los Sprites que no se mueven pero que tienen que
-        #  mostrar alguna animación
-
-
 
     def dibujar(self, pantalla):
+        pantalla.fill((133,133,133))
         self.grupoSprites.draw(pantalla)
 
 
@@ -91,4 +80,10 @@ class Fase(Escena):
 
         # Indicamos la acción a realizar segun la tecla pulsada para cada jugador
         teclasPulsadas = pygame.key.get_pressed()
+        if teclasPulsadas[K_UP]:
+            self.jugador1.keyUp_pulsada = True
+        # Una vez se suelta la tecla se actualiza la variable del jugador para que pueda realizar el segundo salto
+        if (not teclasPulsadas[K_UP]) and self.jugador1.keyUp_pulsada:
+            self.jugador1.keyUp_pulsada = False
+            self.jugador1.keyUp_suelta = True
         self.jugador1.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_a)
