@@ -15,7 +15,7 @@ SPRITE_QUIETO = 0
 SPRITE_ANDANDO = 1
 SPRITE_SALTANDO_SUBIENDO = 2
 SPRITE_SALTANDO_BAJANDO = 3
-ATAQUE_MELEE = 4
+SPRITE_ATAQUE_MELEE = 4
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
@@ -25,6 +25,7 @@ RETARDO_ANIMACION_QUIETO = 10
 RETARDO_ANIMACION_ANDANDO = 7
 RETARDO_ANIMACION_SALTANDO_SUBIENDO = 7
 RETARDO_ANIMACION_SALTANDO_BAJANDO = 7
+RETARDO_ANIMACION_ATAQUE_MELEE = 4
 
 class Jugador(pygame.sprite.Sprite):
     "Jugador"
@@ -96,8 +97,8 @@ class Jugador(pygame.sprite.Sprite):
                 self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_SUBIENDO
             elif self.numPostura == SPRITE_SALTANDO_BAJANDO:
                 self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_BAJANDO
-            elif self.numPostura == ATAQUE_MELEE:
-                self.retardoMovimiento = 4
+            elif self.numPostura == SPRITE_ATAQUE_MELEE:
+                self.retardoMovimiento = RETARDO_ANIMACION_ATAQUE_MELEE
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
@@ -114,7 +115,22 @@ class Jugador(pygame.sprite.Sprite):
 
     def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
-        if teclasPulsadas[arriba]:
+        # La animación de atacando no se puede interrumpir
+        if self.atacando:
+            if (pygame.time.get_ticks() - self.inicio_ataque > 450):
+                self.movimiento = QUIETO
+                self.atacando = False
+        # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
+        # Así puedes atacar sin soltar las teclas de movimiento
+        elif teclasPulsadas[ataque_melee]:
+            # Si estás en el aire, no puedes atacar
+            if self.movimiento != ARRIBA:
+                # Se pone numImagenPostura a 0 porque me da la sensación de que a veces la animación empieza por la mitad
+                self.numImagenPostura = 0
+                self.movimiento = ATAQUE
+                self.inicio_ataque = pygame.time.get_ticks()
+                self.atacando = True
+        elif teclasPulsadas[arriba]:
             self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
@@ -132,14 +148,6 @@ class Jugador(pygame.sprite.Sprite):
             self.movimiento = IZQUIERDA
         elif teclasPulsadas[derecha]:
             self.movimiento = DERECHA
-        elif teclasPulsadas[ataque_melee]:
-            self.movimiento = ATAQUE
-            self.inicio_ataque = pygame.time.get_ticks()
-            self.atacando = True
-        elif self.atacando:
-            if (pygame.time.get_ticks() - self.inicio_ataque > 350):
-                self.movimiento = QUIETO
-                self.atacando = False
         else:
             self.movimiento = QUIETO
 
@@ -179,7 +187,7 @@ class Jugador(pygame.sprite.Sprite):
                 self.numPostura = SPRITE_QUIETO
         elif self.movimiento == ATAQUE:
             if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
-                self.numPostura = ATAQUE_MELEE
+                self.numPostura = SPRITE_ATAQUE_MELEE
         # Si estamos en el aire
         if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
             # Actualizamos la posicion
