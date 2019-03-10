@@ -9,6 +9,7 @@ DERECHA = 2
 ARRIBA = 3
 ABAJO = 4
 ATAQUE = 5
+DASH = 6
 
 #Posturas
 SPRITE_QUIETO = 0
@@ -16,17 +17,20 @@ SPRITE_ANDANDO = 1
 SPRITE_SALTANDO_SUBIENDO = 2
 SPRITE_SALTANDO_BAJANDO = 3
 SPRITE_ATAQUE_MELEE = 4
+SPRITE_DASH = 5
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
-RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
-                              # debería de ser un valor distinto para cada postura
+VELOCIDAD_DASH = 3 * VELOCIDAD_JUGADOR # Pixeles por milisegundo
+
 RETARDO_ANIMACION_QUIETO = 10
 RETARDO_ANIMACION_ANDANDO = 7
 RETARDO_ANIMACION_SALTANDO_SUBIENDO = 7
 RETARDO_ANIMACION_SALTANDO_BAJANDO = 7
 RETARDO_ANIMACION_ATAQUE_MELEE = 4
+RETARDO_ANIMACION_DASH = 7
 
+CD_DASH = 1000 # En milisegundos
 class Jugador(pygame.sprite.Sprite):
     "Jugador"
 
@@ -41,16 +45,17 @@ class Jugador(pygame.sprite.Sprite):
         # Lado hacia el que esta mirando
         self.mirando = IZQUIERDA
         self.atacando = False
+        self.dasheando = False
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('coordenadas.txt')
         datos = datos.split()
         self.numPostura = 1
         self.numImagenPostura = 0
         cont = 0
-        numImagenes = [6,11,2,2,5]
+        numImagenes = [6,11,2,2,6,1]
         self.coordenadasHoja = []
         #for linea in range(0, n): para n movimientos
-        for linea in range(0, 5):
+        for linea in range(0, 6):
             self.coordenadasHoja.append([])
             tmp = self.coordenadasHoja[linea]
             for postura in range(1, numImagenes[linea]+1):
@@ -69,6 +74,9 @@ class Jugador(pygame.sprite.Sprite):
         self.dobleSalto_segundoSalto = False
         # Variable para controlar si se suelta la tecla de salto después de saltar por primera vez
         self.keyUp_suelta = False
+
+        # Variable para controlar el tiempo desde que se utilizó el último dash
+        self.inicio_dash = 0
 
         # La posicion inicial del Sprite
         self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
@@ -99,6 +107,8 @@ class Jugador(pygame.sprite.Sprite):
                 self.retardoMovimiento = RETARDO_ANIMACION_SALTANDO_BAJANDO
             elif self.numPostura == SPRITE_ATAQUE_MELEE:
                 self.retardoMovimiento = RETARDO_ANIMACION_ATAQUE_MELEE
+            elif self.numPostura == SPRITE_DASH:
+                self.retardoMovimiento = RETARDO_ANIMACION_DASH
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
@@ -113,23 +123,33 @@ class Jugador(pygame.sprite.Sprite):
             elif self.mirando == IZQUIERDA:
                 self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
 
-    def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee):
+    def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee, dash):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         # La animación de atacando no se puede interrumpir
-        if self.atacando:
-            if (pygame.time.get_ticks() - self.inicio_ataque > 450):
+        if self.atacando: 
+            if (self.numImagenPostura == 5):
                 self.movimiento = QUIETO
                 self.atacando = False
+        # La animación de dasheando no se puede interrumpir
+        elif self.dasheando:
+            if (pygame.time.get_ticks() - self.inicio_dash > 100):
+                self.movimiento = QUIETO
+                self.dasheando = False
         # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
         # Así puedes atacar sin soltar las teclas de movimiento
         elif teclasPulsadas[ataque_melee]:
             # Si estás en el aire, no puedes atacar
-            if self.movimiento != ARRIBA:
-                # Se pone numImagenPostura a 0 porque me da la sensación de que a veces la animación empieza por la mitad
+            if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
                 self.numImagenPostura = 0
                 self.movimiento = ATAQUE
-                self.inicio_ataque = pygame.time.get_ticks()
                 self.atacando = True
+        elif teclasPulsadas[dash]:
+            # Si estás en el aire, no puedes dashear
+            if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO): 
+                if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
+                    self.movimiento = DASH
+                    self.dasheando = True
+                    self.inicio_dash = pygame.time.get_ticks()
         elif teclasPulsadas[arriba]:
             self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
@@ -186,8 +206,13 @@ class Jugador(pygame.sprite.Sprite):
             if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
                 self.numPostura = SPRITE_QUIETO
         elif self.movimiento == ATAQUE:
-            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
-                self.numPostura = SPRITE_ATAQUE_MELEE
+               self.numPostura = SPRITE_ATAQUE_MELEE
+        elif self.movimiento == DASH:
+            self.numPostura = SPRITE_DASH
+            self.retardoMovimiento = -1
+            self.velocidadx = VELOCIDAD_DASH
+                
+
         # Si estamos en el aire
         if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
             # Actualizamos la posicion
@@ -206,6 +231,17 @@ class Jugador(pygame.sprite.Sprite):
                     self.numPostura = SPRITE_SALTANDO_BAJANDO
             # Nos ponemos en esa posicion en el eje y
             self.rect.bottom = self.posiciony
+        elif self.numPostura == SPRITE_DASH:
+            # Actualizamos la posicion
+            if self.mirando == IZQUIERDA:
+                self.posicionx -= self.velocidadx * tiempo
+            else:
+                self.posicionx += self.velocidadx * tiempo
+            self.rect.left = self.posicionx
+            self.velocidadx -= 0.05  
+            if (self.velocidadx < 0):
+                self.numPostura = SPRITE_QUIETO
+                self.velocidadx = 0 
 
         # Actualizamos la imagen a mostrar
         self.actualizarPostura()
