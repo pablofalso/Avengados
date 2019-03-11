@@ -51,12 +51,12 @@ class Jugador(pygame.sprite.Sprite):
         self.atacando = False
         self.dasheando = False
         # Leemos las coordenadas de un archivo de texto
-        datos = GestorRecursos.CargarArchivoCoordenadas('coordenadas.txt')
+        datos = GestorRecursos.CargarArchivoCoordenadas('mikedenadas.txt')
         datos = datos.split()
         self.numPostura = 1
         self.numImagenPostura = 0
         cont = 0
-        numImagenes = [6,11,2,2,6,1,4]
+        numImagenes = [6,11,2,2,6,1,5]
         self.coordenadasHoja = []
         #for linea in range(0, n): para n movimientos
         for linea in range(0, 7):
@@ -82,6 +82,8 @@ class Jugador(pygame.sprite.Sprite):
         self.dash_desbloqueado = True
         # Variable para controlar el tiempo desde que se utilizó el último dash
         self.inicio_dash = 0
+
+        self.atacando_distancia = False
 
         # La posicion inicial del Sprite
         self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
@@ -142,6 +144,11 @@ class Jugador(pygame.sprite.Sprite):
             if (pygame.time.get_ticks() - self.inicio_dash > DURACION_DASH):
                 self.movimiento = QUIETO
                 self.dasheando = False
+        elif self.atacando_distancia:
+            if (self.numImagenPostura == 4):
+                self.movimiento = QUIETO
+                self.atacando_distancia = False
+                BolaDeFuego(self.posicionx, self.posiciony)
         # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
         # Así puedes atacar sin soltar las teclas de movimiento
         elif teclasPulsadas[ataque_melee]:
@@ -160,7 +167,8 @@ class Jugador(pygame.sprite.Sprite):
                         self.inicio_dash = pygame.time.get_ticks()
         elif teclasPulsadas[ataque_distancia]:
             self.movimiento = ATAQUE_DISTANCIA
-            self.ataque_distancia = True
+            self.atacando_distancia = True
+            self.numImagenPostura = 0
         elif teclasPulsadas[arriba]:
             self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
@@ -253,3 +261,8 @@ class Jugador(pygame.sprite.Sprite):
         # Actualizamos la imagen a mostrar
         self.actualizarPostura()
         return
+
+class BolaDeFuego(pygame.sprite.Sprite):
+    "BolaDeFuego"
+    def __init__(self, posicionx, posiciony):
+        print("fireball")
