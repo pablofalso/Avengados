@@ -23,7 +23,7 @@ SPRITE_ATAQUE_DISTANCIA = 6
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
-VELOCIDAD_DASH = 10 * VELOCIDAD_JUGADOR # Pixeles por milisegundo
+VELOCIDAD_DASH = 3 * VELOCIDAD_JUGADOR # Pixeles por milisegundo
 
 RETARDO_ANIMACION_QUIETO = 10
 RETARDO_ANIMACION_ANDANDO = 7
@@ -34,6 +34,7 @@ RETARDO_ANIMACION_DASH = 7
 RETARDO_ANIMACION_ATAQUE_DISTANCIA = 7
 
 CD_DASH = 1000 # En milisegundos
+DURACION_DASH = 100 # En milisegundos
 class Jugador(pygame.sprite.Sprite):
     "Jugador"
 
@@ -138,7 +139,7 @@ class Jugador(pygame.sprite.Sprite):
                 self.atacando = False
         # La animación de dasheando no se puede interrumpir
         elif self.dasheando:
-            if (pygame.time.get_ticks() - self.inicio_dash > 20):
+            if (pygame.time.get_ticks() - self.inicio_dash > DURACION_DASH):
                 self.movimiento = QUIETO
                 self.dasheando = False
         # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
@@ -220,7 +221,6 @@ class Jugador(pygame.sprite.Sprite):
         elif self.movimiento == DASH:
             self.numPostura = SPRITE_DASH
             self.retardoMovimiento = -1
-            self.velocidadx = VELOCIDAD_DASH
         elif self.movimiento == ATAQUE_DISTANCIA:
             self.numPostura = SPRITE_ATAQUE_DISTANCIA
 
@@ -245,14 +245,10 @@ class Jugador(pygame.sprite.Sprite):
         elif self.numPostura == SPRITE_DASH:
             # Actualizamos la posicion
             if self.mirando == IZQUIERDA:
-                self.posicionx -= self.velocidadx * tiempo
+                self.posicionx -= VELOCIDAD_DASH * tiempo
             else:
-                self.posicionx += self.velocidadx * tiempo
+                self.posicionx += VELOCIDAD_DASH * tiempo
             self.rect.left = self.posicionx
-            self.velocidadx -= 0.05  
-            if (self.velocidadx < 0):
-                self.numPostura = SPRITE_QUIETO
-                self.velocidadx = 0 
 
         # Actualizamos la imagen a mostrar
         self.actualizarPostura()
