@@ -86,4 +86,4 @@ class Fase(Escena):
         if (not teclasPulsadas[K_UP]) and self.jugador1.keyUp_pulsada:
             self.jugador1.keyUp_pulsada = False
             self.jugador1.keyUp_suelta = True
-        self.jugador1.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_a, K_s)
+        self.jugador1.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_a, K_s, K_d)

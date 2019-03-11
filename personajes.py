@@ -10,6 +10,7 @@ ARRIBA = 3
 ABAJO = 4
 ATAQUE = 5
 DASH = 6
+ATAQUE_DISTANCIA = 7
 
 #Posturas
 SPRITE_QUIETO = 0
@@ -18,10 +19,11 @@ SPRITE_SALTANDO_SUBIENDO = 2
 SPRITE_SALTANDO_BAJANDO = 3
 SPRITE_ATAQUE_MELEE = 4
 SPRITE_DASH = 5
+SPRITE_ATAQUE_DISTANCIA = 6
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
-VELOCIDAD_DASH = 3 * VELOCIDAD_JUGADOR # Pixeles por milisegundo
+VELOCIDAD_DASH = 10 * VELOCIDAD_JUGADOR # Pixeles por milisegundo
 
 RETARDO_ANIMACION_QUIETO = 10
 RETARDO_ANIMACION_ANDANDO = 7
@@ -29,6 +31,7 @@ RETARDO_ANIMACION_SALTANDO_SUBIENDO = 7
 RETARDO_ANIMACION_SALTANDO_BAJANDO = 7
 RETARDO_ANIMACION_ATAQUE_MELEE = 4
 RETARDO_ANIMACION_DASH = 7
+RETARDO_ANIMACION_ATAQUE_DISTANCIA = 7
 
 CD_DASH = 1000 # En milisegundos
 class Jugador(pygame.sprite.Sprite):
@@ -52,10 +55,10 @@ class Jugador(pygame.sprite.Sprite):
         self.numPostura = 1
         self.numImagenPostura = 0
         cont = 0
-        numImagenes = [6,11,2,2,6,1]
+        numImagenes = [6,11,2,2,6,1,4]
         self.coordenadasHoja = []
         #for linea in range(0, n): para n movimientos
-        for linea in range(0, 6):
+        for linea in range(0, 7):
             self.coordenadasHoja.append([])
             tmp = self.coordenadasHoja[linea]
             for postura in range(1, numImagenes[linea]+1):
@@ -75,6 +78,7 @@ class Jugador(pygame.sprite.Sprite):
         # Variable para controlar si se suelta la tecla de salto después de saltar por primera vez
         self.keyUp_suelta = False
 
+        self.dash_desbloqueado = True
         # Variable para controlar el tiempo desde que se utilizó el último dash
         self.inicio_dash = 0
 
@@ -109,6 +113,8 @@ class Jugador(pygame.sprite.Sprite):
                 self.retardoMovimiento = RETARDO_ANIMACION_ATAQUE_MELEE
             elif self.numPostura == SPRITE_DASH:
                 self.retardoMovimiento = RETARDO_ANIMACION_DASH
+            elif self.numPostura == SPRITE_ATAQUE_DISTANCIA:
+                self.retardoMovimiento = RETARDO_ANIMACION_ATAQUE_DISTANCIA
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
@@ -123,7 +129,7 @@ class Jugador(pygame.sprite.Sprite):
             elif self.mirando == IZQUIERDA:
                 self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
 
-    def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee, dash):
+    def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee, dash, ataque_distancia):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         # La animación de atacando no se puede interrumpir
         if self.atacando: 
@@ -132,7 +138,7 @@ class Jugador(pygame.sprite.Sprite):
                 self.atacando = False
         # La animación de dasheando no se puede interrumpir
         elif self.dasheando:
-            if (pygame.time.get_ticks() - self.inicio_dash > 100):
+            if (pygame.time.get_ticks() - self.inicio_dash > 20):
                 self.movimiento = QUIETO
                 self.dasheando = False
         # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
@@ -143,13 +149,17 @@ class Jugador(pygame.sprite.Sprite):
                 self.numImagenPostura = 0
                 self.movimiento = ATAQUE
                 self.atacando = True
-        elif teclasPulsadas[dash]:
-            # Si estás en el aire, no puedes dashear
-            if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO): 
-                if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
-                    self.movimiento = DASH
-                    self.dasheando = True
-                    self.inicio_dash = pygame.time.get_ticks()
+        elif teclasPulsadas[dash]: 
+            if self.dash_desbloqueado:
+                # Si estás en el aire, no puedes dashear
+                if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO): 
+                    if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
+                        self.movimiento = DASH
+                        self.dasheando = True
+                        self.inicio_dash = pygame.time.get_ticks()
+        elif teclasPulsadas[ataque_distancia]:
+            self.movimiento = ATAQUE_DISTANCIA
+            self.ataque_distancia = True
         elif teclasPulsadas[arriba]:
             self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
@@ -211,7 +221,8 @@ class Jugador(pygame.sprite.Sprite):
             self.numPostura = SPRITE_DASH
             self.retardoMovimiento = -1
             self.velocidadx = VELOCIDAD_DASH
-                
+        elif self.movimiento == ATAQUE_DISTANCIA:
+            self.numPostura = SPRITE_ATAQUE_DISTANCIA
 
         # Si estamos en el aire
         if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
