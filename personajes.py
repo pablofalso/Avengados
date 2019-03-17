@@ -33,11 +33,37 @@ RETARDO_ANIMACION_ATAQUE_MELEE = 4
 RETARDO_ANIMACION_DASH = 7
 RETARDO_ANIMACION_ATAQUE_DISTANCIA = 7
 
-CD_DASH = 1000 # En milisegundos
+CD_DASH = 500 # En milisegundos
 DURACION_DASH = 100 # En milisegundos
-class Jugador(pygame.sprite.Sprite):
-    "Jugador"
 
+
+# Clase MiSprite
+class MiSprite(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.posicion = (0,0)
+        self.velocidad = (0, 0)
+
+    def establecerPosicion(self, posicion):
+        self.posicionx = posicion[0]
+        self.posiciony = posicion[1]
+        self.rect.left = self.posicionx
+        self.rect.bottom = self.posiciony
+
+    def incrementarPosicion(self, incremento):
+        (posx, posy) = self.posicion
+        (incrementox, incrementoy) = incremento
+        self.establecerPosicion((posx+incrementox, posy+incrementoy))
+
+    def update(self, tiempo):
+        incrementox = self.velocidad[0]*tiempo
+        incrementoy = self.velocidad[1]*tiempo
+        self.incrementarPosicion((incrementox, incrementoy))
+
+
+
+class Jugador(MiSprite):
+    "Jugador"
     def __init__(self):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self)
@@ -89,10 +115,7 @@ class Jugador(pygame.sprite.Sprite):
         self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
 
         # La posicion x e y que ocupa
-        self.posicionx = 300
-        self.posiciony = 300
-        self.rect.left = self.posicionx
-        self.rect.bottom = self.posiciony
+
         # Velocidad en el eje y (para los saltos)
         #  En el eje x se utilizaria si hubiese algun tipo de inercia
         self.velocidady = 0
@@ -135,7 +158,7 @@ class Jugador(pygame.sprite.Sprite):
     def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee, dash, ataque_distancia):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         # La animación de atacando no se puede interrumpir
-        if self.atacando: 
+        if self.atacando:
             if (self.numImagenPostura == 5):
                 self.movimiento = QUIETO
                 self.atacando = False
@@ -157,10 +180,10 @@ class Jugador(pygame.sprite.Sprite):
                 self.numImagenPostura = 0
                 self.movimiento = ATAQUE
                 self.atacando = True
-        elif teclasPulsadas[dash]: 
+        elif teclasPulsadas[dash]:
             if self.dash_desbloqueado:
                 # Si estás en el aire, no puedes dashear
-                if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO): 
+                if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
                     if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
                         self.movimiento = DASH
                         self.dasheando = True

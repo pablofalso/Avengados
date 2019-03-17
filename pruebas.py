@@ -4,6 +4,7 @@ import pygame, escena
 from escena import *
 from personajes import *
 from pygame.locals import *
+import parser_escena
 
 # -------------------------------------------------
 # -------------------------------------------------
@@ -44,6 +45,10 @@ class Fase(Escena):
 
         # Creamos los sprites de los jugadores
         self.jugador1 = Jugador()
+        fullname = os.path.join('escenas', 'test.xml')
+        self.xmldoc = parser_escena.parse(fullname)
+
+        self.jugador1.establecerPosicion(parser_escena.coordenadasPersonaje('coordenada',self.xmldoc))
         self.jugador1.keyUp_pulsada = False
         self.grupoJugadores = pygame.sprite.Group(self.jugador1)
 
