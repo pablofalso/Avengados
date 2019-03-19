@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+    <coordenadasJugador>
+        <coordenada name="0"></coordenada>
+        <coordenada name="300"></coordenada>
+    </coordenadasJugador>
+    <coordenadasPlataformas>
+        <plataforma1 name="0"></plataforma1>
+        <plataforma1 name="300"></plataforma1>
+        <plataforma1 name="375"></plataforma1>
+        <plataforma1 name="300"></plataforma1>
+
+        <plataforma2 name="420"></plataforma2>
+        <plataforma2 name="200"></plataforma2>
+        <plataforma2 name="470"></plataforma2>
+        <plataforma2 name="200"></plataforma2>
+
+        <plataforma3 name="620"></plataforma3>
+        <plataforma3 name="200"></plataforma3>
+        <plataforma3 name="670"></plataforma3>
+        <plataforma3 name="200"></plataforma3>
+
+        <plataforma4 name="700"></plataforma4>
+        <plataforma4 name="300"></plataforma4>
+        <plataforma4 name="1400"></plataforma4>
+        <plataforma4 name="300"></plataforma4>
+    </coordenadasPlataformas>
+</data>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+    <coordenadasJugador>
+        <coordenada name="0"></coordenada>
+        <coordenada name="450"></coordenada>
+    </coordenadasJugador>
+    <coordenadasPlataformas>
+        <plataforma1 name="0"></plataforma1>
+        <plataforma1 name="450"></plataforma1>
+    </coordenadasPlataformas>
+</data>

@@ -15,13 +15,14 @@ import parser_escena
 VELOCIDAD_SOL = 0.1 # Pixeles por milisegundo
 
 # Los bordes de la pantalla para hacer scroll horizontal
-MINIMO_X_JUGADOR = 50
+MINIMO_X_JUGADOR = 5
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
+MAXIMO_Y_JUGADOR = ALTO_PANTALLA - MINIMO_X_JUGADOR
 
 # -------------------------------------------------
 # Clase Fase
 
-class Agua(Escena):
+class Aire(Escena):
     def __init__(self, director):
 
         # Habria que pasarle como parámetro el número de fase, a partir del cual se cargue
@@ -40,33 +41,32 @@ class Agua(Escena):
         # Creamos el decorado y el fondo
         # Que parte del decorado estamos visualizando
         self.scrollx = 0
-        self.distancia_scroll_derecha = 100
+        self.scrolly = 0
+        self.distancia_scroll_derecha = 100 # distancia a la que empezará a scrollear la pantalla si vas hacia la derecha
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
 
         # Creamos los sprites de los jugadores
         self.jugador1 = Jugador()
-        fullname = os.path.join('escenas', 'agua.xml')
+        fullname = os.path.join('escenas', 'aire.xml')
         self.xmldoc = parser_escena.parse(fullname)
 
         self.jugador1.establecerPosicion(parser_escena.coordenadasPersonaje('coordenada',self.xmldoc))
         self.jugador1.keyUp_pulsada = False
         self.grupoJugadores = pygame.sprite.Group(self.jugador1)
 
-        plataforma1 = Plataforma(parser_escena.coordenadasPlataforma('plataforma1',self.xmldoc))
-        plataforma2 = Plataforma(parser_escena.coordenadasPlataforma('plataforma2',self.xmldoc))
-        plataforma3 = Plataforma(parser_escena.coordenadasPlataforma('plataforma3',self.xmldoc))
-        plataforma4 = Plataforma(parser_escena.coordenadasPlataforma('plataforma4',self.xmldoc))
-
+        plataforma1 = Plataforma(pygame.Rect(0, 450, 1995, 5),2000,5)
+        plataforma2 = Plataforma(pygame.Rect(695, 150, 195, 5),200,5)
 
         # y el grupo con las mismas
-        self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2, plataforma3, plataforma4)
+        self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2)
 
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4)
+        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2)
+
 
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
@@ -110,6 +110,8 @@ class Agua(Escena):
                 #  (desplazamos a la derecha)
                 self.scrollx = self.scrollx + desplazamiento + self.distancia_scroll_derecha
 
+
+
             return True # Se ha actualizado el scroll
         return False
 
@@ -125,6 +127,9 @@ class Agua(Escena):
 
 
             # Ademas, actualizamos el decorado para que se muestre una parte distinta
+
+
+
 
 
     def update(self,tiempo):
@@ -167,13 +172,13 @@ class Agua(Escena):
 
 #class Plataforma(pygame.sprite.Sprite):
 class Plataforma(MiSprite):
-    def __init__(self,plataforma):
+    def __init__(self,rectangulo,dimensionX,dimensionY):
         # Primero invocamos al constructor de la clase padre
         MiSprite.__init__(self)
         # Rectangulo con las coordenadas en pantalla que ocupara
-        self.rect = plataforma[0]
+        self.rect = rectangulo
         # Y lo situamos de forma global en esas coordenadas
         self.establecerPosicion((self.rect.left, self.rect.bottom))
         # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
-        self.image = pygame.Surface((plataforma[1], plataforma[2]))
+        self.image = pygame.Surface((dimensionX, dimensionY))
         self.image.fill((0,0,0))

@@ -43,11 +43,12 @@ class MiSprite(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.posicion = (0,0)
         self.velocidad = (0, 0)
+        self.scroll = (0,0)
 
     def establecerPosicion(self, posicion):
         self.posicion = posicion
-        self.rect.left = self.posicion[0]
-        self.rect.bottom = self.posicion[1]
+        self.rect.left = self.posicion[0] - self.scroll[0]
+        self.rect.bottom = self.posicion[1] - self.scroll[1]
 
     def incrementarPosicion(self, incremento):
         (incrementox, incrementoy) = incremento
@@ -57,6 +58,13 @@ class MiSprite(pygame.sprite.Sprite):
         incrementox = self.velocidadx*tiempo
         incrementoy = self.velocidady*tiempo
         self.incrementarPosicion((incrementox, incrementoy))
+
+    def establecerPosicionPantalla(self, scrollDecorado):
+        self.scroll = scrollDecorado
+        (scrollx, scrolly) = self.scroll
+        (posx, posy) = self.posicion
+        self.rect.left = posx - scrollx
+        self.rect.bottom = posy - scrolly
 
 
 
@@ -75,6 +83,7 @@ class Jugador(MiSprite):
         self.atacando = False
         self.dasheando = False
         self.velocidadx = 0
+        self.scroll=(0,0)
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('mikedenadas.txt')
         datos = datos.split()
@@ -236,10 +245,10 @@ class Jugador(MiSprite):
                 self.velocidadx = 0.2
         if self.movimiento == ARRIBA:
             self.numPostura = SPRITE_SALTANDO_SUBIENDO
-            self.velocidady = -0.6
+            self.velocidady = -0.5
 
         if (self.numPostura == SPRITE_SALTANDO_SUBIENDO) or (self.numPostura == SPRITE_SALTANDO_BAJANDO):
-            self.velocidady += 0.012
+            self.velocidady += 0.01
             if self.velocidady > 0:
                 self.numPostura == SPRITE_SALTANDO_BAJANDO
         if self.movimiento == QUIETO :

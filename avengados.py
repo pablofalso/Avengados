@@ -7,6 +7,7 @@ import director
 from director import *
 from pruebas import Fase
 from temploAgua import Agua
+from temploAire import Aire
 
 if __name__ == '__main__':
 
