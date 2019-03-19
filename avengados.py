@@ -6,6 +6,7 @@ import pygame
 import director
 from director import *
 from pruebas import Fase
+from temploAgua import Agua
 
 if __name__ == '__main__':
 
@@ -14,7 +15,7 @@ if __name__ == '__main__':
     # Creamos el director
     director = Director()
     # Creamos la escena con la pantalla inicial
-    escena = Fase(director)
+    escena = Agua(director)
     # Le decimos al director que apile esta escena
     director.apilarEscena(escena)
     # Y ejecutamos el juego

@@ -45,19 +45,17 @@ class MiSprite(pygame.sprite.Sprite):
         self.velocidad = (0, 0)
 
     def establecerPosicion(self, posicion):
-        self.posicionx = posicion[0]
-        self.posiciony = posicion[1]
-        self.rect.left = self.posicionx
-        self.rect.bottom = self.posiciony
+        self.posicion = posicion
+        self.rect.left = self.posicion[0]
+        self.rect.bottom = self.posicion[1]
 
     def incrementarPosicion(self, incremento):
-        (posx, posy) = self.posicion
         (incrementox, incrementoy) = incremento
-        self.establecerPosicion((posx+incrementox, posy+incrementoy))
+        self.establecerPosicion((self.posicion[0]+incrementox, self.posicion[1]+incrementoy))
 
     def update(self, tiempo):
-        incrementox = self.velocidad[0]*tiempo
-        incrementoy = self.velocidad[1]*tiempo
+        incrementox = self.velocidadx*tiempo
+        incrementoy = self.velocidady*tiempo
         self.incrementarPosicion((incrementox, incrementoy))
 
 
@@ -76,6 +74,7 @@ class Jugador(MiSprite):
         self.mirando = IZQUIERDA
         self.atacando = False
         self.dasheando = False
+        self.velocidadx = 0
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('mikedenadas.txt')
         datos = datos.split()
@@ -171,7 +170,7 @@ class Jugador(MiSprite):
             if (self.numImagenPostura == 4):
                 self.movimiento = QUIETO
                 self.atacando_distancia = False
-                BolaDeFuego(self.posicionx, self.posiciony)
+                BolaDeFuego(self.posicion[0], self.posicion[1])
         # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
         # Así puedes atacar sin soltar las teclas de movimiento
         elif teclasPulsadas[ataque_melee]:
@@ -215,74 +214,53 @@ class Jugador(MiSprite):
 
 
 
-    def update(self, tiempo):
-        # Si vamos a la izquierda
-        if self.movimiento == IZQUIERDA:
-            # Si no estamos en el aire, la postura actual sera estar caminando
-            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+    def update(self, tiempo, grupoPlataformas):
+        plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
+        #Primero se mira si está encima de una plataforma, si no está cae
+        if plataforma == None:
+            self.numPostura = SPRITE_SALTANDO_BAJANDO
+        #Si esta colisionando entonces para
+        elif ((plataforma.rect.bottom >= self.rect.bottom or self.velocidady > 0)) and self.numPostura == SPRITE_SALTANDO_BAJANDO:
+            self.velocidady = 0
+            self.numPostura = SPRITE_QUIETO
+            self.establecerPosicion((self.posicion[0], plataforma.posicion[1]))
+        if self.movimiento == IZQUIERDA or self.movimiento == DERECHA:
+            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO) and not (self.numPostura == SPRITE_SALTANDO_BAJANDO):
                 self.numPostura = SPRITE_ANDANDO
-            # Esta mirando a la izquierda
-            self.mirando = IZQUIERDA
-            # Actualizamos la posicion
-            self.posicionx -= VELOCIDAD_JUGADOR * tiempo
-            self.rect.left = self.posicionx
-        # Si vamos a la derecha
-        elif self.movimiento == DERECHA:
-            # Si no estamos en el aire, la postura actual sera estar caminando
-            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
-                self.numPostura = SPRITE_ANDANDO
-            # Esta mirando a la derecha
-            self.mirando = DERECHA
-            # Actualizamos la posicion
-            self.posicionx += VELOCIDAD_JUGADOR * tiempo
-            self.rect.left = self.posicionx
-        # Si estamos saltando
-        elif self.movimiento == ARRIBA:
-            # La postura actual sera estar saltando
+            self.mirando = self.movimiento
+            # Si vamos a la izquierda, le ponemos velocidad en esa dirección
+            if self.movimiento == IZQUIERDA:
+                self.velocidadx = -0.2
+            # Si vamos a la derecha, le ponemos velocidad en esa dirección
+            else:
+                self.velocidadx = 0.2
+        if self.movimiento == ARRIBA:
             self.numPostura = SPRITE_SALTANDO_SUBIENDO
-            # Le imprimimos una velocidad en el eje y
-            self.velocidady = VELOCIDAD_SALTO_JUGADOR
-        # Si no se ha pulsado ninguna tecla
-        elif self.movimiento == QUIETO:
-            # Si no estamos saltando, la postura actual será estar quieto
-            if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+            self.velocidady = -0.6
+
+        if (self.numPostura == SPRITE_SALTANDO_SUBIENDO) or (self.numPostura == SPRITE_SALTANDO_BAJANDO):
+            self.velocidady += 0.012
+            if self.velocidady > 0:
+                self.numPostura == SPRITE_SALTANDO_BAJANDO
+        if self.movimiento == QUIETO :
+            if self.numPostura != SPRITE_SALTANDO_SUBIENDO and self.numPostura != SPRITE_SALTANDO_BAJANDO :
                 self.numPostura = SPRITE_QUIETO
-        elif self.movimiento == ATAQUE:
+                self.dobleSalto_segundoSalto = False
+            self.velocidadx = 0
+        if self.movimiento == ATAQUE:
                self.numPostura = SPRITE_ATAQUE_MELEE
-        elif self.movimiento == DASH:
+        if self.movimiento == DASH:
             self.numPostura = SPRITE_DASH
             self.retardoMovimiento = -1
-        elif self.movimiento == ATAQUE_DISTANCIA:
+            if self.mirando == DERECHA:
+                self.velocidadx = 2
+            else:
+                self.velocidadx = -2
+        if self.movimiento == ATAQUE_DISTANCIA:
             self.numPostura = SPRITE_ATAQUE_DISTANCIA
 
-        # Si estamos en el aire
-        if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
-            # Actualizamos la posicion
-            self.posiciony -= self.velocidady * tiempo
-            # Si llegamos a la posicion inferior, paramos de caer y lo ponemos como quieto
-            if (self.posiciony>300):
-                self.numPostura = SPRITE_QUIETO
-                # Se actualiza la variable para controlar si se ha realizado el segundo salto
-                self.dobleSalto_segundoSalto = False
-                self.posiciony = 300
-                self.velocidady = 0
-            # Si no, aplicamos el efecto de la gravedad
-            else:
-                self.velocidady -= 0.008
-                if self.velocidady <= 0:
-                    self.numPostura = SPRITE_SALTANDO_BAJANDO
-            # Nos ponemos en esa posicion en el eje y
-            self.rect.bottom = self.posiciony
-        elif self.numPostura == SPRITE_DASH:
-            # Actualizamos la posicion
-            if self.mirando == IZQUIERDA:
-                self.posicionx -= VELOCIDAD_DASH * tiempo
-            else:
-                self.posicionx += VELOCIDAD_DASH * tiempo
-            self.rect.left = self.posicionx
-
-        # Actualizamos la imagen a mostrar
         self.actualizarPostura()
+        MiSprite.update(self,tiempo)
         return
 
 class BolaDeFuego(pygame.sprite.Sprite):
