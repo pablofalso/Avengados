@@ -53,6 +53,12 @@ class Agua(Escena):
         self.jugador1.keyUp_pulsada = False
         self.grupoJugadores = pygame.sprite.Group(self.jugador1)
 
+        enemigo1 = Enemigo()
+        enemigo1.establecerPosicion((1100, 300))
+
+        # Creamos un grupo con los enemigos
+        self.grupoEnemigos = pygame.sprite.Group( enemigo1 )
+
         plataforma1 = Plataforma(parser_escena.coordenadasPlataforma('plataforma1',self.xmldoc))
         plataforma2 = Plataforma(parser_escena.coordenadasPlataforma('plataforma2',self.xmldoc))
         plataforma3 = Plataforma(parser_escena.coordenadasPlataforma('plataforma3',self.xmldoc))
@@ -70,15 +76,17 @@ class Agua(Escena):
         self.grupoParedes = pygame.sprite.Group(pared1, pared2, pared3)
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
-        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1)
+        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1, enemigo1)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, plataforma5, plataforma6, plataforma7, pared1, pared2, pared3)
+        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, plataforma5, plataforma6, plataforma7, pared1, pared2, pared3, enemigo1)
+        self.grupoEnemigos = pygame.sprite.Group(enemigo1)
 
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
-
     def actualizarScrollOrdenados(self, jugador):
-        if (jugador.rect.left<MINIMO_X_JUGADOR):
+        print(jugador.rect  .left)
+        if (jugador.rect.left < MINIMO_X_JUGADOR):
+
             desplazamiento = MINIMO_X_JUGADOR - jugador.rect.left
 
             # Si el escenario ya está a la izquierda del todo, no lo movemos mas
@@ -89,6 +97,7 @@ class Agua(Escena):
                 jugador.establecerPosicion((MINIMO_X_JUGADOR, jugador.posicion[1]))
 
                 return False # No se ha actualizado el scroll
+
 
             # Si se puede hacer scroll a la izquierda
             else:
@@ -121,18 +130,6 @@ class Agua(Escena):
 
 
 
-    def actualizarScroll(self, jugador1):
-        cambioScroll = self.actualizarScrollOrdenados(jugador1)
-        # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
-        if cambioScroll:
-            # Actualizamos la posición en pantalla de todos los Sprites según el scroll actual
-            for sprite in iter(self.grupoSprites):
-                sprite.establecerPosicionPantalla((self.scrollx, 0))
-
-
-            # Ademas, actualizamos el decorado para que se muestre una parte distinta
-
-
     def update(self,tiempo):
 
 
@@ -140,7 +137,9 @@ class Agua(Escena):
         # De esta forma, se simula que cambian todos a la vez
         # Esta operación de update ya comprueba que los movimientos sean correctos
         #  y, si lo son, realiza el movimiento de los Sprites
-        self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes)
+        for enemigo in iter(self.grupoEnemigos):
+            enemigo.mover(self.jugador1)
+        self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos)
         self.actualizarScroll(self.jugador1)
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)
@@ -194,7 +193,5 @@ class Pared(MiSprite):
         # Y lo situamos de forma global en esas coordenadas
         self.establecerPosicion((self.rect.left, self.rect.bottom))
         # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
-        print (plataforma[1])
-        print (plataforma[2])
         self.image = pygame.Surface((plataforma[1], plataforma[2]))
         self.image.fill((0,0,0))
