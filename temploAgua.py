@@ -58,15 +58,17 @@ class Agua(Escena):
         plataforma3 = Plataforma(parser_escena.coordenadasPlataforma('plataforma3',self.xmldoc))
         plataforma4 = Plataforma(parser_escena.coordenadasPlataforma('plataforma4',self.xmldoc))
 
-
+        self.enemigo1 = EnemigoComun()
+        self.grupoEnemigos = pygame.sprite.Group(self.enemigo1)
+        self.enemigo1.establecerPosicion((100,300))
         # y el grupo con las mismas
         self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2, plataforma3, plataforma4)
 
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
-        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1)
+        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1, self.grupoEnemigos)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4)
+        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, self.grupoEnemigos)
 
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
