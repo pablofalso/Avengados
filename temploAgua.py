@@ -83,53 +83,18 @@ class Agua(Escena):
 
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
-    def actualizarScrollOrdenados(self, jugador):
-        if (jugador.rect.left < MINIMO_X_JUGADOR):
 
-            desplazamiento = MINIMO_X_JUGADOR - jugador.rect.left
-
-            # Si el escenario ya está a la izquierda del todo, no lo movemos mas
-            if self.scrollx <= 0:
-                self.scrollx = 0
-
-                # En su lugar, colocamos al jugador que esté más a la izquierda a la izquierda de todo
-                jugador.establecerPosicion((MINIMO_X_JUGADOR, jugador.posicion[1]))
-
-                return False # No se ha actualizado el scroll
-
-
-            # Si se puede hacer scroll a la izquierda
-            else:
-                # Calculamos el nivel de scroll actual: el anterior - desplazamiento
-                #  (desplazamos a la izquierda)
-                self.scrollx = self.scrollx - desplazamiento
-
-                return True # Se ha actualizado el scroll
-        # Si el jugador de la derecha se encuentra más allá del borde derecho
-        if (jugador.rect.right > MAXIMO_X_JUGADOR - self.distancia_scroll_derecha):
-            # Se calcula cuantos pixeles esta fuera del borde
-            desplazamiento = jugador.rect.right - MAXIMO_X_JUGADOR
-
-            # Si el escenario ya está a la derecha del todo, no lo movemos mas
-
-            if self.scrollx + ANCHO_PANTALLA >= 4000:
-                self.scrollx = ANCHO_PANTALLA
-                jugador.establecerPosicion((jugador.posicion[0]-desplazamiento-self.distancia_scroll_derecha, jugador.posicion[1]))
-                return False # No se ha actualizado el scroll
-
-            # Si se puede hacer scroll a la derecha
-            else:
-
-                # Calculamos el nivel de scroll actual: el anterior + desplazamiento
-                #  (desplazamos a la derecha)
-                self.scrollx = self.scrollx + desplazamiento + self.distancia_scroll_derecha
-
-            return True # Se ha actualizado el scroll
+    def actualizarScrollHorizontal(self,jugador1):
+        if (jugador1.mirando == DERECHA and jugador1.rect.right >= ANCHO_PANTALLA/2):
+            self.scrollx =  self.scrollx + 3
+            return True
+        if (jugador1.mirando == IZQUIERDA and jugador1.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0):
+            self.scrollx =  self.scrollx - 3
+            return True
         return False
 
-
     def actualizarScroll(self, jugador1):
-        cambioScroll = self.actualizarScrollOrdenados(jugador1)
+        cambioScroll = self.actualizarScrollHorizontal(jugador1)
         # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
         if cambioScroll:
             # Actualizamos la posición en pantalla de todos los Sprites según el scroll actual

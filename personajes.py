@@ -232,6 +232,10 @@ class Jugador(MiSprite):
 
 
     def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
+        if self.posicion[0] <= 0:
+            self.establecerPosicion((2, self.posicion[1]))
+        if self.posicion[0] > 1500:
+            self.establecerPosicion((1498, self.posicion[1]))
         plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
         pared  = pygame.sprite.spritecollideany(self, grupoParedes)
         #Primero se mira si está encima de una plataforma, si no está cae
