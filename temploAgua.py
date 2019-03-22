@@ -43,7 +43,7 @@ class Agua(Escena):
         self.distancia_scroll_derecha = ANCHO_PANTALLA/2
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
-
+        self.decorado = Decorado()
         # Creamos los sprites de los jugadores
         self.jugador1 = Jugador()
         fullname = os.path.join('escenas', 'agua.xml')
@@ -122,7 +122,11 @@ class Agua(Escena):
 
     def dibujar(self, pantalla):
         pantalla.fill((133,133,133))
-        #self.decorado.dibujar(pantalla)
+        # Ponemos primero el fondo
+        #self.fondo.dibujar(pantalla)
+        # Después el decorado
+        self.decorado.dibujar(pantalla)
+        # Luego los Sprites
         self.grupoSprites.draw(pantalla)
 
 
