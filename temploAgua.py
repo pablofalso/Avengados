@@ -84,7 +84,6 @@ class Agua(Escena):
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
     def actualizarScrollOrdenados(self, jugador):
-        print(jugador.rect  .left)
         if (jugador.rect.left < MINIMO_X_JUGADOR):
 
             desplazamiento = MINIMO_X_JUGADOR - jugador.rect.left
@@ -128,6 +127,17 @@ class Agua(Escena):
             return True # Se ha actualizado el scroll
         return False
 
+
+    def actualizarScroll(self, jugador1):
+        cambioScroll = self.actualizarScrollOrdenados(jugador1)
+        # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
+        if cambioScroll:
+            # Actualizamos la posición en pantalla de todos los Sprites según el scroll actual
+            for sprite in iter(self.grupoSprites):
+                sprite.establecerPosicionPantalla((self.scrollx, 0))
+
+
+            # Ademas, actualizamos el decorado para que se muestre una parte distinta
 
 
     def update(self,tiempo):
