@@ -191,11 +191,11 @@ class Jugador(MiSprite):
         elif teclasPulsadas[dash]:
             if self.dash_desbloqueado:
                 # Si estás en el aire, no puedes dashear
-                if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
-                    if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
-                        self.movimiento = DASH
-                        self.dasheando = True
-                        self.inicio_dash = pygame.time.get_ticks()
+                #if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+                if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
+                    self.movimiento = DASH
+                    self.dasheando = True
+                    self.inicio_dash = pygame.time.get_ticks()
         elif teclasPulsadas[ataque_distancia]:
             self.movimiento = ATAQUE_DISTANCIA
             self.atacando_distancia = True
@@ -223,16 +223,23 @@ class Jugador(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas):
+    def update(self, tiempo, grupoPlataformas, grupoParedes):
         plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
+        pared  = pygame.sprite.spritecollideany(self, grupoParedes)
         #Primero se mira si está encima de una plataforma, si no está cae
         if plataforma == None:
             self.numPostura = SPRITE_SALTANDO_BAJANDO
         #Si esta colisionando entonces para
-        elif ((plataforma.rect.bottom >= self.rect.bottom or self.velocidady > 0)) and self.numPostura == SPRITE_SALTANDO_BAJANDO:
+        elif ((plataforma.rect.bottom >= self.rect.top and self.velocidady > 0)):
             self.velocidady = 0
             self.numPostura = SPRITE_QUIETO
             self.establecerPosicion((self.posicion[0], plataforma.posicion[1]))
+        if pared != None:
+            if (self.mirando == IZQUIERDA):
+                self.establecerPosicion((pared.posicion[0]+5, self.posicion[1]))
+            else:
+                if (self.posicion[0] < pared.posicion[0]):
+                    self.establecerPosicion((pared.posicion[0]-45, self.posicion[1]))
         if self.movimiento == IZQUIERDA or self.movimiento == DERECHA:
             if not (self.numPostura == SPRITE_SALTANDO_SUBIENDO) and not (self.numPostura == SPRITE_SALTANDO_BAJANDO):
                 self.numPostura = SPRITE_ANDANDO
@@ -245,10 +252,10 @@ class Jugador(MiSprite):
                 self.velocidadx = 0.2
         if self.movimiento == ARRIBA:
             self.numPostura = SPRITE_SALTANDO_SUBIENDO
-            self.velocidady = -0.5
+            self.velocidady = -0.3
 
         if (self.numPostura == SPRITE_SALTANDO_SUBIENDO) or (self.numPostura == SPRITE_SALTANDO_BAJANDO):
-            self.velocidady += 0.01
+            self.velocidady += 0.008
             if self.velocidady > 0:
                 self.numPostura == SPRITE_SALTANDO_BAJANDO
         if self.movimiento == QUIETO :
@@ -258,14 +265,16 @@ class Jugador(MiSprite):
             self.velocidadx = 0
         if self.movimiento == ATAQUE:
                self.numPostura = SPRITE_ATAQUE_MELEE
+               self.velocidadx = 0
         if self.movimiento == DASH:
             self.numPostura = SPRITE_DASH
             self.retardoMovimiento = -1
             if self.mirando == DERECHA:
-                self.velocidadx = 2
+                self.velocidadx = 1
             else:
-                self.velocidadx = -2
+                self.velocidadx = -1
         if self.movimiento == ATAQUE_DISTANCIA:
+            self.velocidadx = 0
             self.numPostura = SPRITE_ATAQUE_DISTANCIA
 
         self.actualizarPostura()

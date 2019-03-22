@@ -15,7 +15,7 @@ import parser_escena
 VELOCIDAD_SOL = 0.1 # Pixeles por milisegundo
 
 # Los bordes de la pantalla para hacer scroll horizontal
-MINIMO_X_JUGADOR = 50
+MINIMO_X_JUGADOR = 0
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
 # -------------------------------------------------
@@ -40,7 +40,7 @@ class Agua(Escena):
         # Creamos el decorado y el fondo
         # Que parte del decorado estamos visualizando
         self.scrollx = 0
-        self.distancia_scroll_derecha = 100
+        self.distancia_scroll_derecha = ANCHO_PANTALLA/2
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
 
@@ -57,16 +57,22 @@ class Agua(Escena):
         plataforma2 = Plataforma(parser_escena.coordenadasPlataforma('plataforma2',self.xmldoc))
         plataforma3 = Plataforma(parser_escena.coordenadasPlataforma('plataforma3',self.xmldoc))
         plataforma4 = Plataforma(parser_escena.coordenadasPlataforma('plataforma4',self.xmldoc))
-
+        plataforma5 = Plataforma(parser_escena.coordenadasPlataforma('plataforma5',self.xmldoc))
+        plataforma6 = Plataforma(parser_escena.coordenadasPlataforma('plataforma6',self.xmldoc))
+        plataforma7 = Plataforma(parser_escena.coordenadasPlataforma('plataforma7',self.xmldoc))
+        pared1 = Pared(parser_escena.coordenadasPared('pared1',self.xmldoc))
+        pared2 = Pared(parser_escena.coordenadasPared('pared2',self.xmldoc))
+        pared3 = Pared(parser_escena.coordenadasPared('pared3',self.xmldoc))
+        #pared4 = Pared(parser_escena.coordenadasPared('pared3',self.xmldoc))
 
         # y el grupo con las mismas
-        self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2, plataforma3, plataforma4)
-
+        self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2, plataforma3, plataforma4,plataforma5, plataforma6, plataforma7)
+        self.grupoParedes = pygame.sprite.Group(pared1, pared2, pared3)
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4)
+        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, plataforma5, plataforma6, plataforma7, pared1, pared2, pared3)
 
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
@@ -134,7 +140,7 @@ class Agua(Escena):
         # De esta forma, se simula que cambian todos a la vez
         # Esta operación de update ya comprueba que los movimientos sean correctos
         #  y, si lo son, realiza el movimiento de los Sprites
-        self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas)
+        self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes)
         self.actualizarScroll(self.jugador1)
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)
@@ -175,5 +181,20 @@ class Plataforma(MiSprite):
         # Y lo situamos de forma global en esas coordenadas
         self.establecerPosicion((self.rect.left, self.rect.bottom))
         # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
+        self.image = pygame.Surface((plataforma[1], plataforma[2]))
+        self.image.fill((0,0,0))
+
+
+class Pared(MiSprite):
+    def __init__(self,plataforma):
+        # Primero invocamos al constructor de la clase padre
+        MiSprite.__init__(self)
+        # Rectangulo con las coordenadas en pantalla que ocupara
+        self.rect = plataforma[0]
+        # Y lo situamos de forma global en esas coordenadas
+        self.establecerPosicion((self.rect.left, self.rect.bottom))
+        # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
+        print (plataforma[1])
+        print (plataforma[2])
         self.image = pygame.Surface((plataforma[1], plataforma[2]))
         self.image.fill((0,0,0))
