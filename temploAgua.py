@@ -69,16 +69,16 @@ class Agua(Escena):
         pared1 = Pared(parser_escena.coordenadasPared('pared1',self.xmldoc))
         pared2 = Pared(parser_escena.coordenadasPared('pared2',self.xmldoc))
         pared3 = Pared(parser_escena.coordenadasPared('pared3',self.xmldoc))
-        #pared4 = Pared(parser_escena.coordenadasPared('pared3',self.xmldoc))
+        pared4 = Pared(parser_escena.coordenadasPared('pared4',self.xmldoc))
 
         # y el grupo con las mismas
         self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2, plataforma3, plataforma4,plataforma5, plataforma6, plataforma7)
-        self.grupoParedes = pygame.sprite.Group(pared1, pared2, pared3)
+        self.grupoParedes = pygame.sprite.Group(pared1, pared2, pared3, pared4)
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1, enemigo1)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, plataforma5, plataforma6, plataforma7, pared1, pared2, pared3, enemigo1)
+        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, plataforma5, plataforma6, plataforma7, pared1, pared2, pared3, pared4, enemigo1)
         self.grupoEnemigos = pygame.sprite.Group(enemigo1)
 
 
@@ -125,7 +125,7 @@ class Agua(Escena):
         # Ponemos primero el fondo
         #self.fondo.dibujar(pantalla)
         # Después el decorado
-        self.decorado.dibujar(pantalla)
+        #self.decorado.dibujar(pantalla)
         # Luego los Sprites
         self.grupoSprites.draw(pantalla)
 
