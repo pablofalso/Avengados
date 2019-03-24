@@ -83,7 +83,7 @@ class Agua(Escena):
         if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2):
             self.scrollx =  self.scrollx + 3
             return True
-        if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0):
+        if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and (3200 - jugador.posicion[0] >= ANCHO_PANTALLA/2)):
             self.scrollx =  self.scrollx - 3
             return True
         return False

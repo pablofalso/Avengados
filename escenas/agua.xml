@@ -11,15 +11,32 @@
         <plataforma x="420" y="200" z="470"/>
         <plataforma x="620" y="250" z="670"/>
         <plataforma x="820" y="200" z="870"/>
-        <plataforma x="1050" y="300" z="1800"/>
-        <plataforma x="1300" y="150" z="1405"/>
+        <plataforma x="1050" y="300" z="1905"/>
+        <plataforma x="1300" y="230" z="1405"/>
         <plataforma x="375" y="350" z="1050"/>
+        <!---
+        Aqui empiezan las coordenas de la segunda parte
+        del nivel
+      -->
+        <plataforma x="1900" y="500" z="2800"/>
+        <plataforma x="1995" y="250" z="2070"/>
+        <plataforma x="2270" y="300" z="2320"/>
+        <plataforma x="2470" y="255" z="2520"/>
+        <plataforma x="2670" y="255" z="2720"/>
+        <plataforma x="2800" y="300" z="3250"/>
+        <plataforma x="3000" y="150" z="3250"/>
     </coordenadasPlataformas>
 
     <coordenadasParedes>
-        <pared x="1300" y="150" z="300"/>
-        <pared x="1400" y="150" z="300"/>
+        <pared x="1300" y="235" z="300"/>
+        <pared x="1400" y="235" z="300"/>
         <pared x="375" y="305" z="350"/>
         <pared x="1300" y="150" z="300"/>
+        <!---
+        Aqui empiezan las coordenas de la segunda parte
+        del nivel
+      -->
+        <pared x="1900" y="305" z="890"/>
+        <pared x="2800" y="305" z="890"/>
     </coordenadasParedes>
 </data>
