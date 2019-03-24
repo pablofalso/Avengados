@@ -6,25 +6,35 @@ def parse(fullname):
     xmldoc = minidom.parse(fullname)
     return xmldoc
 
+def coordenadasPersonaje(tag, xmldoc):
+    res =  xmldoc.getElementsByTagName('plataforma')
+    return (int(res[0].attributes['x'].value),int(res[0].attributes['y'].value))
 
-def devolver(tag,xmldoc):
-    itemlist = xmldoc.getElementsByTagName(tag)
-    return itemlist
+def listaCoordenadasPlataforma(xmldoc):
+    res = xmldoc.getElementsByTagName('plataforma')
+    lista = []
+    for i in range(0,len(res)):
+        x = int(res[i].attributes['x'].value)
+        y = int(res[i].attributes['y'].value)
+        z = int(res[i].attributes['z'].value)
+        lista.append([pygame.Rect(x, y, z-x-5, 5),z-x,5])
+    return lista
 
-def coordenadasPersonaje(tag,xmldoc):
-    res = devolver(tag,xmldoc)
-    return (int(res[0].attributes['name'].value),int(res[1].attributes['name'].value))
+def listaCoordenadasPared(xmldoc):
+    res = xmldoc.getElementsByTagName('pared')
+    lista = []
+    for i in range(0,len(res)):
+        x = int(res[i].attributes['x'].value)
+        y = int(res[i].attributes['y'].value)
+        z = int(res[i].attributes['z'].value)
+        lista.append([pygame.Rect(x, y, 5, z-y-10),5,z-y+5])
+    return lista
 
-def coordenadasPlataforma(tag,xmldoc):
-    res = devolver(tag,xmldoc)
-    x = int(res[0].attributes['name'].value)
-    y = int(res[1].attributes['name'].value)
-    z = int(res[2].attributes['name'].value)
-    return (pygame.Rect(x, y, z-x-5, 5),z-x,5)
-
-def coordenadasPared(tag,xmldoc):
-    res = devolver(tag,xmldoc)
-    x = int(res[0].attributes['name'].value)
-    y = int(res[1].attributes['name'].value)
-    z = int(res[3].attributes['name'].value)
-    return (pygame.Rect(x, y, 5, z-y-10),5,z-y+5)
+def listaCoordenadasPersonaje(tag, xmldoc):
+    res = xmldoc.getElementsByTagName(tag)
+    lista = []
+    for i in range(0,len(res)):
+        x = int(res[i].attributes['x'].value)
+        y = int(res[i].attributes['y'].value)
+        lista.append((x,y))
+    return lista
