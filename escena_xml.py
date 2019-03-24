@@ -19,8 +19,8 @@ MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 # -------------------------------------------------
 # Clase Fase
 
-class Agua(Escena):
-    def __init__(self, director):
+class EscenaXML(Escena):
+    def __init__(self, director, xml):
 
         # Habria que pasarle como parámetro el número de fase, a partir del cual se cargue
         #  un fichero donde este la configuracion de esa fase en concreto, con cosas como
@@ -46,7 +46,7 @@ class Agua(Escena):
         self.jugador = Jugador()
         self.jugador.keyUp_pulsada = False
 
-        fullname = os.path.join('escenas', 'agua.xml')
+        fullname = os.path.join('escenas', xml)
         self.xmldoc = parser_escena.parse(fullname)
         self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
         
@@ -120,7 +120,7 @@ class Agua(Escena):
         # Ponemos primero el fondo
         #self.fondo.dibujar(pantalla)
         # Después el decorado
-        #self.decorado.dibujar(pantalla)
+        self.decorado.dibujar(pantalla)
         # Luego los Sprites
         self.grupoSprites.draw(pantalla)
 
