@@ -57,7 +57,7 @@ class Agua(Escena):
         enemigo1.establecerPosicion((1100, 300))
 
         # Creamos un grupo con los enemigos
-        self.grupoEnemigos = pygame.sprite.Group( enemigo1 )
+        self.grupoEnemigos = pygame.sprite.Group(enemigo1)
 
         plataforma1 = Plataforma(parser_escena.coordenadasPlataforma('plataforma1',self.xmldoc))
         plataforma2 = Plataforma(parser_escena.coordenadasPlataforma('plataforma2',self.xmldoc))
@@ -66,26 +66,37 @@ class Agua(Escena):
         plataforma5 = Plataforma(parser_escena.coordenadasPlataforma('plataforma5',self.xmldoc))
         plataforma6 = Plataforma(parser_escena.coordenadasPlataforma('plataforma6',self.xmldoc))
         plataforma7 = Plataforma(parser_escena.coordenadasPlataforma('plataforma7',self.xmldoc))
+        plataforma8 = Plataforma(parser_escena.coordenadasPlataforma('plataforma8',self.xmldoc))
+        plataforma9 = Plataforma(parser_escena.coordenadasPlataforma('plataforma9',self.xmldoc))
+        plataforma10 = Plataforma(parser_escena.coordenadasPlataforma('plataforma10',self.xmldoc))
+        plataforma11 = Plataforma(parser_escena.coordenadasPlataforma('plataforma11',self.xmldoc))
+        plataforma12 = Plataforma(parser_escena.coordenadasPlataforma('plataforma12',self.xmldoc))
+        plataforma13 = Plataforma(parser_escena.coordenadasPlataforma('plataforma13',self.xmldoc))
+        plataforma14 = Plataforma(parser_escena.coordenadasPlataforma('plataforma14',self.xmldoc))
         pared1 = Pared(parser_escena.coordenadasPared('pared1',self.xmldoc))
         pared2 = Pared(parser_escena.coordenadasPared('pared2',self.xmldoc))
         pared3 = Pared(parser_escena.coordenadasPared('pared3',self.xmldoc))
         pared4 = Pared(parser_escena.coordenadasPared('pared4',self.xmldoc))
+        pared5 = Pared(parser_escena.coordenadasPared('pared5',self.xmldoc))
+        pared6 = Pared(parser_escena.coordenadasPared('pared6',self.xmldoc))
 
         # y el grupo con las mismas
-        self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2, plataforma3, plataforma4,plataforma5, plataforma6, plataforma7)
-        self.grupoParedes = pygame.sprite.Group(pared1, pared2, pared3, pared4)
+        self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2, plataforma3, plataforma4,plataforma5, plataforma6, plataforma7, plataforma8, plataforma9, plataforma9,
+        plataforma10, plataforma11, plataforma12, plataforma13, plataforma14)
+        self.grupoParedes = pygame.sprite.Group(pared1, pared2, pared3, pared4, pared5, pared6)
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1, enemigo1)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, plataforma5, plataforma6, plataforma7, pared1, pared2, pared3, pared4, enemigo1)
+        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, plataforma5, plataforma6, plataforma7, plataforma8, plataforma9, plataforma9,
+        plataforma10, plataforma11, plataforma12, plataforma13, plataforma14, pared1, pared2, pared3, pared4, pared5, pared6, enemigo1)
         self.grupoEnemigos = pygame.sprite.Group(enemigo1)
 
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
 
     def actualizarScrollHorizontal(self,jugador1):
-        if (jugador1.mirando == DERECHA and jugador1.rect.right >= ANCHO_PANTALLA/2):
+        if (jugador1.mirando == DERECHA and jugador1.rect.right >= ANCHO_PANTALLA/2 and (3200 - jugador1.posicion[0] >= ANCHO_PANTALLA/2)):
             self.scrollx =  self.scrollx + 3
             return True
         if (jugador1.mirando == IZQUIERDA and jugador1.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0):

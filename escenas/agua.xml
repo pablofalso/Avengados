@@ -28,30 +28,72 @@
 
         <plataforma5 name="1050"></plataforma5>
         <plataforma5 name="300"></plataforma5>
-        <plataforma5 name="1800"></plataforma5>
+        <plataforma5 name="1905"></plataforma5>
         <plataforma5 name="300"></plataforma5>
 
         <plataforma6 name="1300"></plataforma6>
-        <plataforma6 name="150"></plataforma6>
+        <plataforma6 name="230"></plataforma6>
         <plataforma6 name="1405"></plataforma6>
-        <plataforma6 name="150"></plataforma6>
+        <plataforma6 name="250"></plataforma6>
 
         <plataforma7 name="375"></plataforma7>
         <plataforma7 name="350"></plataforma7>
         <plataforma7 name="1050"></plataforma7>
         <plataforma7 name="350"></plataforma7>
 
+        <!---
+          Aqui empiezan las coordenas de la segunda parte
+          del nivel
+        -->
+        <plataforma8 name="1900"></plataforma8>
+        <plataforma8 name="500"></plataforma8>
+        <plataforma8 name="2800"></plataforma8>
+        <plataforma8 name="500"></plataforma8>
+
+        <plataforma9 name="1995"></plataforma9>
+        <plataforma9 name="250"></plataforma9>
+        <plataforma9 name="2070"></plataforma9>
+        <plataforma9 name="250"></plataforma9>
+
+        <plataforma10 name="2270"></plataforma10>
+        <plataforma10 name="300"></plataforma10>
+        <plataforma10 name="2320"></plataforma10>
+        <plataforma10 name="300"></plataforma10>
+
+        <plataforma11 name="2470"></plataforma11>
+        <plataforma11 name="255"></plataforma11>
+        <plataforma11 name="2520"></plataforma11>
+        <plataforma11 name="255"></plataforma11>
+
+        <plataforma12 name="2670"></plataforma12>
+        <plataforma12 name="255"></plataforma12>
+        <plataforma12 name="2720"></plataforma12>
+        <plataforma12 name="255"></plataforma12>
+
+        <plataforma13 name="2800"></plataforma13>
+        <plataforma13 name="300"></plataforma13>
+        <plataforma13 name="3250"></plataforma13>
+        <plataforma13 name="300"></plataforma13>
+
+        <plataforma14 name="3000"></plataforma14>
+        <plataforma14 name="150"></plataforma14>
+        <plataforma14 name="3250"></plataforma14>
+        <plataforma14 name="150"></plataforma14>
+
+
+
+
     </coordenadasPlataformas>
 
     <coordenadasParedes>
 
       <pared1 name="1300"></pared1>
-      <pared1 name="155"></pared1>
+      <pared1 name="235"></pared1>
       <pared1 name="890"></pared1>
       <pared1 name="300"></pared1>
 
       <pared2 name="1400"></pared2>
-      <pared2 name="155"></pared2>
+      <pared2 name="235"></pared2>
       <pared2 name="890"></pared2>
       <pared2 name="300"></pared2>
 
@@ -64,6 +106,21 @@
       <pared4 name="305"></pared4>
       <pared4 name="890"></pared4>
       <pared4 name="350"></pared4>
+
+      <!---
+        Aqui empiezan las coordenas de la segunda parte
+        del nivel
+      -->
+
+      <pared5 name="1900"></pared5>
+      <pared5 name="305"></pared5>
+      <pared5 name="890"></pared5>
+      <pared5 name="500"></pared5>
+
+      <pared6 name="2800"></pared6>
+      <pared6 name="305"></pared6>
+      <pared6 name="890"></pared6>
+      <pared6 name="500"></pared6>
 
 
 
