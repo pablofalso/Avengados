@@ -381,14 +381,18 @@ class Enemigo(MiSprite):
         if (abs(self.posicion[0]-jugador.posicion[0]) <= 200):
             if (self.posicion[0] > jugador.posicion[0]):
                 self.mirando = IZQUIERDA
+                self.movimiento = IZQUIERDA
             else:
                 self.mirando = DERECHA
+                self.movimiento = DERECHA
         elif (abs(self.posicion[0]-jugador.posicion[0]) <= 10):
             if (self.posicion[0] > jugador.posicion[0]):
                 self.mirando = IZQUIERDA
+                self.movimiento = IZQUIERDA
             else:
                 self.mirando = DERECHA
-            self.movimiento = ATAQUE_ENEMIGO
+                self.movimiento = DERECHA
+            #self.movimiento = ATAQUE_ENEMIGO
         else:
             if (pygame.time.get_ticks() - self.empezar_andar >= 1000):
                 if self.mirando == 1:

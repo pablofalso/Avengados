@@ -31,12 +31,13 @@
         <pared x="1300" y="235" z="300"/>
         <pared x="1400" y="235" z="300"/>
         <pared x="375" y="305" z="350"/>
-        <pared x="1300" y="150" z="300"/>
+        <pared x="1050" y="305" z="350"/>
+        <pared x="1300" y="235" z="300"/>
         <!---
         Aqui empiezan las coordenas de la segunda parte
         del nivel
       -->
-        <pared x="1900" y="305" z="890"/>
-        <pared x="2800" y="305" z="890"/>
+        <pared x="1900" y="305" z="500"/>
+        <pared x="2800" y="305" z="500"/>
     </coordenadasParedes>
 </data>

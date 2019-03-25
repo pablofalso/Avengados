@@ -20,7 +20,7 @@ MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 # Clase Fase
 
 class Agua(Escena):
-    def __init__(self, director):
+    def __init__(self, director, xml):
 
         # Habria que pasarle como parámetro el número de fase, a partir del cual se cargue
         #  un fichero donde este la configuracion de esa fase en concreto, con cosas como
@@ -46,10 +46,10 @@ class Agua(Escena):
         self.jugador = Jugador()
         self.jugador.keyUp_pulsada = False
 
-        fullname = os.path.join('escenas', 'agua.xml')
+        fullname = os.path.join('escenas', xml)
         self.xmldoc = parser_escena.parse(fullname)
         self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
-        
+
         # Creamos las plataformas
         listaPlataformas = parser_escena.listaCoordenadasPlataforma(self.xmldoc)
         self.grupoPlataformas = pygame.sprite.Group()
@@ -80,10 +80,11 @@ class Agua(Escena):
     # Devuelve True o False según se ha tenido que desplazar el scroll
 
     def actualizarScrollHorizontal(self,jugador):
-        if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2):
+        if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2 and jugador.posicion[0] <= 3200 - ANCHO_PANTALLA/2):
+            print (jugador.velocidadx)
             self.scrollx =  self.scrollx + 3
             return True
-        if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and (3200 - jugador.posicion[0] >= ANCHO_PANTALLA/2)):
+        if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0 and jugador.posicion[0] >= ANCHO_PANTALLA/2):
             self.scrollx =  self.scrollx - 3
             return True
         return False
