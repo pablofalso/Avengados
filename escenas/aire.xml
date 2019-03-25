@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data>
-    <coordenadasJugador>
-        <coordenada name="0"></coordenada>
-        <coordenada name="450"></coordenada>
-    </coordenadasJugador>
+    <coordenadasPersonajes>
+        <Mike x="0" y="450"/>
+
+        <EnemigoComun x="1100" y="300"/>
+    </coordenadasPersonajes>
+
     <coordenadasPlataformas>
-        <plataforma1 name="0"></plataforma1>
-        <plataforma1 name="450"></plataforma1>
+        <plataforma x="0" y="450" z="205"/>
+        <plataforma x="300" y="350" z="100"/>
+        <plataforma x="500" y="300" z="100"/>
+        <plataforma x="700" y="250" z="100"/>
+        <plataforma x="900" y="200" z="1000"/>
+
+
+
+
     </coordenadasPlataformas>
+
+    <coordenadasParedes>
+      <pared x="200" y="455" z="600"/>
+    </coordenadasParedes>
 </data>

@@ -1,72 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data>
-    <coordenadasJugador>
-        <coordenada name="0"></coordenada>
-        <coordenada name="300"></coordenada>
-    </coordenadasJugador>
+    <coordenadasPersonajes>
+        <Mike x="0" y="300"/>
+
+        <EnemigoComun x="1100" y="300"/>
+    </coordenadasPersonajes>
+
     <coordenadasPlataformas>
-        <plataforma1 name="0"></plataforma1>
-        <plataforma1 name="300"></plataforma1>
-        <plataforma1 name="380"></plataforma1>
-        <plataforma1 name="300"></plataforma1>
-
-        <plataforma2 name="420"></plataforma2>
-        <plataforma2 name="200"></plataforma2>
-        <plataforma2 name="470"></plataforma2>
-        <plataforma2 name="200"></plataforma2>
-
-
-        <plataforma3 name="620"></plataforma3>
-        <plataforma3 name="250"></plataforma3>
-        <plataforma3 name="670"></plataforma3>
-        <plataforma3 name="250"></plataforma3>
-
-        <plataforma4 name="820"></plataforma4>
-        <plataforma4 name="200"></plataforma4>
-        <plataforma4 name="870"></plataforma4>
-        <plataforma4 name="200"></plataforma4>
-
-        <plataforma5 name="1050"></plataforma5>
-        <plataforma5 name="300"></plataforma5>
-        <plataforma5 name="1800"></plataforma5>
-        <plataforma5 name="300"></plataforma5>
-
-        <plataforma6 name="1300"></plataforma6>
-        <plataforma6 name="150"></plataforma6>
-        <plataforma6 name="1405"></plataforma6>
-        <plataforma6 name="150"></plataforma6>
-
-        <plataforma7 name="375"></plataforma7>
-        <plataforma7 name="350"></plataforma7>
-        <plataforma7 name="1050"></plataforma7>
-        <plataforma7 name="350"></plataforma7>
-
+        <plataforma x="0" y="300" z="380"/>
+        <plataforma x="420" y="200" z="50"/>
+        <plataforma x="620" y="250" z="50"/>
+        <plataforma x="820" y="200" z="50"/>
+        <plataforma x="1050" y="300" z="855"/>
+        <plataforma x="1300" y="230" z="105"/>
+        <plataforma x="375" y="350" z="675"/>
+        <!---
+        Aqui empiezan las coordenas de la segunda parte
+        del nivel
+      -->
+        <plataforma x="1900" y="500" z="900"/>
+        <plataforma x="1995" y="250" z="175"/>
+        <plataforma x="2270" y="300" z="50"/>
+        <plataforma x="2470" y="255" z="50"/>
+        <plataforma x="2670" y="255" z="50"/>
+        <plataforma x="2800" y="300" z="450"/>
+        <plataforma x="3000" y="150" z="250"/>
     </coordenadasPlataformas>
 
     <coordenadasParedes>
-
-      <pared1 name="1300"></pared1>
-      <pared1 name="155"></pared1>
-      <pared1 name="890"></pared1>
-      <pared1 name="305"></pared1>
-
-      <pared2 name="1400"></pared2>
-      <pared2 name="155"></pared2>
-      <pared2 name="890"></pared2>
-      <pared2 name="305"></pared2>
-
-      <pared3 name="375"></pared3>
-      <pared3 name="305"></pared3>
-      <pared3 name="890"></pared3>
-      <pared3 name="350"></pared3>
-
-      <pared4 name="1300"></pared4>
-      <pared4 name="150"></pared4>
-      <pared4 name="890"></pared4>
-      <pared4 name="300"></pared4>
-
-
-
-
+        <pared x="1300" y="235" z="300"/>
+        <pared x="1400" y="235" z="300"/>
+        <pared x="375" y="305" z="350"/>
+        <pared x="1050" y="305" z="350"/>
+        <pared x="1300" y="235" z="300"/>
+        <!---
+        Aqui empiezan las coordenas de la segunda parte
+        del nivel
+      -->
+        <pared x="1900" y="305" z="500"/>
+        <pared x="2800" y="305" z="500"/>
     </coordenadasParedes>
 </data>

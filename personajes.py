@@ -2,6 +2,8 @@ import pygame, sys, os
 from pygame.locals import *
 from gestorRecursos import *
 
+HP = 3
+CD_RECIBIRDANO = 1500
 # Movimientos
 QUIETO = 0
 IZQUIERDA = 1
@@ -86,6 +88,8 @@ class Jugador(MiSprite):
         self.hoja = self.hoja.convert_alpha()
         # El movimiento que esta realizando
         self.movimiento = QUIETO
+        self.hp = HP
+        self.ultimo_golpe = 0
         # Lado hacia el que esta mirando
         self.mirando = DERECHA
         self.atacando = False
@@ -232,10 +236,18 @@ class Jugador(MiSprite):
 
 
     def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
+        enemigos = pygame.sprite.spritecollideany(self, grupoEnemigos)
+        if enemigos != None:
+            if self.movimiento != ATAQUE and pygame.time.get_ticks() - self.ultimo_golpe > CD_RECIBIRDANO:
+                self.ultimo_golpe = pygame.time.get_ticks()
+                self.hp -= 1
+                if self.hp == 0:
+                    print('LA PALMASTE BOY')
         if self.posicion[0] <= 0:
             self.establecerPosicion((2, self.posicion[1]))
-        if self.posicion[0] > 1500:
-            self.establecerPosicion((1498, self.posicion[1]))
+        if self.posicion[0] > 3200:
+            print("LOGICO")
+            self.establecerPosicion((3200, self.posicion[1]))
         plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
         pared  = pygame.sprite.spritecollideany(self, grupoParedes)
         #Primero se mira si está encima de una plataforma, si no está cae
@@ -377,23 +389,29 @@ class Enemigo(MiSprite):
     def mover(self, jugador):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         # La animación de atacando no se puede interrumpir
+        if (pygame.sprite.collide_rect(self, jugador)):
+            if jugador.movimiento == ATAQUE:
+                self.remove()
         if (abs(self.posicion[0]-jugador.posicion[0]) <= 200):
             if (self.posicion[0] > jugador.posicion[0]):
                 self.mirando = IZQUIERDA
+                self.movimiento = IZQUIERDA
             else:
                 self.mirando = DERECHA
+                self.movimiento = DERECHA
         elif (abs(self.posicion[0]-jugador.posicion[0]) <= 10):
             if (self.posicion[0] > jugador.posicion[0]):
                 self.mirando = IZQUIERDA
+                self.movimiento = IZQUIERDA
             else:
                 self.mirando = DERECHA
-            self.movimiento = ATAQUE_ENEMIGO
+                self.movimiento = DERECHA
+            #self.movimiento = ATAQUE_ENEMIGO
         else:
             if (pygame.time.get_ticks() - self.empezar_andar >= 1000):
                 if self.mirando == 1:
                     self.mirando = DERECHA
                     self.movimiento = DERECHA
-
                 else:
                     self.mirando = IZQUIERDA
                     self.movimiento = IZQUIERDA

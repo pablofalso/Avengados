@@ -16,7 +16,7 @@ if __name__ == '__main__':
     # Creamos el director
     director = Director()
     # Creamos la escena con la pantalla inicial
-    escena = Agua(director)
+    escena = Agua(director,'agua.xml')
     # Le decimos al director que apile esta escena
     director.apilarEscena(escena)
     # Y ejecutamos el juego

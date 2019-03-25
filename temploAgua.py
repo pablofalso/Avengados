@@ -12,17 +12,19 @@ import parser_escena
 # -------------------------------------------------
 # -------------------------------------------------
 
-VELOCIDAD_SOL = 0.1 # Pixeles por milisegundo
-
 # Los bordes de la pantalla para hacer scroll horizontal
-MINIMO_X_JUGADOR = 0
+MINIMO_X_JUGADOR = 200
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
+MINIMO_Y_JUGADOR = 100
+MAXIMO_Y_JUGADOR = ALTO_PANTALLA - MINIMO_Y_JUGADOR
+MAXIMO_Y = -1000
+MAXIMO_X = 3200
 
 # -------------------------------------------------
 # Clase Fase
 
 class Agua(Escena):
-    def __init__(self, director):
+    def __init__(self, director, xml):
 
         # Habria que pasarle como parámetro el número de fase, a partir del cual se cargue
         #  un fichero donde este la configuracion de esa fase en concreto, con cosas como
@@ -40,82 +42,158 @@ class Agua(Escena):
         # Creamos el decorado y el fondo
         # Que parte del decorado estamos visualizando
         self.scrollx = 0
+        self.scrolly = 0
         self.distancia_scroll_derecha = ANCHO_PANTALLA/2
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
         self.decorado = Decorado()
         # Creamos los sprites de los jugadores
-        self.jugador1 = Jugador()
-        fullname = os.path.join('escenas', 'agua.xml')
+        self.jugador = Jugador()
+        self.jugador.keyUp_pulsada = False
+
+        fullname = os.path.join('escenas', xml)
         self.xmldoc = parser_escena.parse(fullname)
+        self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
 
-        self.jugador1.establecerPosicion(parser_escena.coordenadasPersonaje('coordenada',self.xmldoc))
-        self.jugador1.keyUp_pulsada = False
-        self.grupoJugadores = pygame.sprite.Group(self.jugador1)
+        # Creamos las plataformas
+        listaPlataformas = parser_escena.listaCoordenadasPlataforma(self.xmldoc)
+        self.grupoPlataformas = pygame.sprite.Group()
+        for coordenadas in listaPlataformas:
+            self.grupoPlataformas.add(Plataforma(coordenadas))
 
-        enemigo1 = Enemigo()
-        enemigo1.establecerPosicion((1100, 300))
+        # Creamos las paredes
+        listaParedes = parser_escena.listaCoordenadasPared(self.xmldoc)
+        self.grupoParedes = pygame.sprite.Group()
+        for coordenadas in listaParedes:
+            self.grupoParedes.add(Pared(coordenadas))
 
-        # Creamos un grupo con los enemigos
-        self.grupoEnemigos = pygame.sprite.Group( enemigo1 )
+        # Creamos los enemigos comunes
+        listaEnemigosComunes = parser_escena.listaCoordenadasPersonaje('EnemigoComun', self.xmldoc)
+        self.grupoEnemigos = pygame.sprite.Group()
+        for coordenadas in listaEnemigosComunes:
+            enemigo = Enemigo()
+            enemigo.establecerPosicion(coordenadas)
+            self.grupoEnemigos.add(enemigo)
 
-        plataforma1 = Plataforma(parser_escena.coordenadasPlataforma('plataforma1',self.xmldoc))
-        plataforma2 = Plataforma(parser_escena.coordenadasPlataforma('plataforma2',self.xmldoc))
-        plataforma3 = Plataforma(parser_escena.coordenadasPlataforma('plataforma3',self.xmldoc))
-        plataforma4 = Plataforma(parser_escena.coordenadasPlataforma('plataforma4',self.xmldoc))
-        plataforma5 = Plataforma(parser_escena.coordenadasPlataforma('plataforma5',self.xmldoc))
-        plataforma6 = Plataforma(parser_escena.coordenadasPlataforma('plataforma6',self.xmldoc))
-        plataforma7 = Plataforma(parser_escena.coordenadasPlataforma('plataforma7',self.xmldoc))
-        pared1 = Pared(parser_escena.coordenadasPared('pared1',self.xmldoc))
-        pared2 = Pared(parser_escena.coordenadasPared('pared2',self.xmldoc))
-        pared3 = Pared(parser_escena.coordenadasPared('pared3',self.xmldoc))
-        #pared4 = Pared(parser_escena.coordenadasPared('pared3',self.xmldoc))
-
-        # y el grupo con las mismas
-        self.grupoPlataformas = pygame.sprite.Group(plataforma1, plataforma2, plataforma3, plataforma4,plataforma5, plataforma6, plataforma7)
-        self.grupoParedes = pygame.sprite.Group(pared1, pared2, pared3)
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
-        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador1, enemigo1)
+        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.jugador1, plataforma1, plataforma2, plataforma3, plataforma4, plataforma5, plataforma6, plataforma7, pared1, pared2, pared3, enemigo1)
-        self.grupoEnemigos = pygame.sprite.Group(enemigo1)
+        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes)
 
+    def actualizarScrollHorizontal(self, jugador):
+        # Si el jugador de la izquierda se encuentra más allá del borde izquierdo
+        if jugador.rect.left < MINIMO_X_JUGADOR:
+            desplazamiento = MINIMO_X_JUGADOR - jugador.rect.left
 
-    # Devuelve True o False según se ha tenido que desplazar el scroll
+            # Si el escenario ya está a la izquierda del todo, no lo movemos mas
+            if self.scrollx <= 0:
+                self.scrollx = 0
 
-    def actualizarScrollHorizontal(self,jugador1):
-        if (jugador1.mirando == DERECHA and jugador1.rect.right >= ANCHO_PANTALLA/2):
-            self.scrollx =  self.scrollx + 3
-            return True
-        if (jugador1.mirando == IZQUIERDA and jugador1.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0):
-            self.scrollx =  self.scrollx - 3
-            return True
+                # En su lugar, colocamos al jugador que esté más a la izquierda a la izquierda de todo
+                jugador.establecerPosicion((MINIMO_X_JUGADOR, jugador.posicion[1]))
+                
+                return False# No se ha actualizado el scroll
+            else:
+                # Calculamos el nivel de scroll actual: el anterior - desplazamiento
+                #  (desplazamos a la izquierda)
+                self.scrollx = self.scrollx - desplazamiento
+
+                return True; # Se ha actualizado el scroll
+        
+        # Si el jugador de la derecha se encuentra más allá del borde derecho
+        if (jugador.rect.right > MAXIMO_X_JUGADOR):
+
+            # Se calcula cuantos pixeles esta fuera del borde
+            desplazamiento = jugador.rect.right - MAXIMO_X_JUGADOR
+
+            # Si el escenario ya está a la derecha del todo, no lo movemos mas
+            if self.scrollx + ANCHO_PANTALLA >= MAXIMO_X:
+                self.scrollx = self.decorado.rect.right - ANCHO_PANTALLA
+
+                # En su lugar, colocamos al jugador que esté más a la derecha a la derecha de todo
+                jugador.establecerPosicion((self.scrollx + MAXIMO_X_JUGADOR - jugador.rect.width, jugador.posicion[1]))
+
+                return False; # No se ha actualizado el scroll
+            else:
+                # Calculamos el nivel de scroll actual: el anterior + desplazamiento
+                #  (desplazamos a la derecha)
+                self.scrollx = self.scrollx + desplazamiento
+
+                return True # Se ha actualizado el scroll
+
+        # Si el jugador está en el limite de la pantalla
         return False
 
-    def actualizarScroll(self, jugador1):
-        cambioScroll = self.actualizarScrollHorizontal(jugador1)
+    def actualizarScrollVertical(self, jugador):
+        # Si el jugador de la izquierda se encuentra más allá del borde izquierdo
+        if jugador.rect.top < MINIMO_Y_JUGADOR:
+            desplazamiento = MINIMO_Y_JUGADOR - jugador.rect.top
+
+            # Si el escenario ya está a la izquierda del todo, no lo movemos mas
+            if self.scrolly <= MAXIMO_Y:
+                self.scrolly = MAXIMO_Y
+                # En su lugar, colocamos al jugador que esté más a la izquierda a la izquierda de todo
+                jugador.establecerPosicion((jugador.posicion[0], MINIMO_Y_JUGADOR))
+                
+                return False# No se ha actualizado el scroll
+            else:
+                # Calculamos el nivel de scroll actual: el anterior - desplazamiento
+                #  (desplazamos a la izquierda)
+                self.scrolly = self.scrolly - desplazamiento
+
+                return True; # Se ha actualizado el scroll
+        
+        # Si el jugador de la derecha se encuentra más allá del borde derecho
+        if (jugador.rect.bottom > MAXIMO_Y_JUGADOR):
+
+            # Se calcula cuantos pixeles esta fuera del borde
+            desplazamiento = jugador.rect.bottom - MAXIMO_Y_JUGADOR
+
+            # Si el escenario ya está a la derecha del todo, no lo movemos mas
+            if self.scrolly + ALTO_PANTALLA >= -MAXIMO_Y:
+                self.scrolly = self.decorado.rect.bottom - ALTO_PANTALLA
+
+                # En su lugar, colocamos al jugador que esté más a la derecha a la derecha de todo
+                jugador.establecerPosicion((jugador.posicion[0], self.scrolly + MAXIMO_Y_JUGADOR - jugador.rect.height))
+
+                return False; # No se ha actualizado el scroll
+            else:
+                # Calculamos el nivel de scroll actual: el anterior + desplazamiento
+                #  (desplazamos a la derecha)
+                self.scrolly = self.scrolly + desplazamiento
+
+                return True # Se ha actualizado el scroll
+
+        # Si el jugador está en el limite de la pantalla
+        return False
+
+    
+    def actualizarScroll(self, jugador):
+        cambioScroll = self.actualizarScrollHorizontal(jugador) or self.actualizarScrollVertical(jugador)
+
         # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
         if cambioScroll:
             # Actualizamos la posición en pantalla de todos los Sprites según el scroll actual
             for sprite in iter(self.grupoSprites):
-                sprite.establecerPosicionPantalla((self.scrollx, 0))
-
+                sprite.establecerPosicionPantalla((self.scrollx, self.scrolly))
 
             # Ademas, actualizamos el decorado para que se muestre una parte distinta
+            self.decorado.update(self.scrollx)
 
+            
 
     def update(self,tiempo):
-
-
         # Actualizamos los Sprites dinamicos
         # De esta forma, se simula que cambian todos a la vez
         # Esta operación de update ya comprueba que los movimientos sean correctos
         #  y, si lo son, realiza el movimiento de los Sprites
+        if self.jugador.hp <= 0:
+            self.director.salirPrograma()
         for enemigo in iter(self.grupoEnemigos):
-            enemigo.mover(self.jugador1)
+            enemigo.mover(self.jugador)
         self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos)
-        self.actualizarScroll(self.jugador1)
+        self.actualizarScroll(self.jugador)
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)
 
@@ -125,7 +203,7 @@ class Agua(Escena):
         # Ponemos primero el fondo
         #self.fondo.dibujar(pantalla)
         # Después el decorado
-        self.decorado.dibujar(pantalla)
+        #self.decorado.dibujar(pantalla)
         # Luego los Sprites
         self.grupoSprites.draw(pantalla)
 
@@ -140,12 +218,12 @@ class Agua(Escena):
         # Indicamos la acción a realizar segun la tecla pulsada para cada jugador
         teclasPulsadas = pygame.key.get_pressed()
         if teclasPulsadas[K_UP]:
-            self.jugador1.keyUp_pulsada = True
+            self.jugador.keyUp_pulsada = True
         # Una vez se suelta la tecla se actualiza la variable del jugador para que pueda realizar el segundo salto
-        if (not teclasPulsadas[K_UP]) and self.jugador1.keyUp_pulsada:
-            self.jugador1.keyUp_pulsada = False
-            self.jugador1.keyUp_suelta = True
-        self.jugador1.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_a, K_s, K_d)
+        if (not teclasPulsadas[K_UP]) and self.jugador.keyUp_pulsada:
+            self.jugador.keyUp_pulsada = False
+            self.jugador.keyUp_suelta = True
+        self.jugador.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_a, K_s, K_d)
 
 
 
