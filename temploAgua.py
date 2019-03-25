@@ -102,12 +102,12 @@ class Agua(Escena):
 
 
     def update(self,tiempo):
-
-
         # Actualizamos los Sprites dinamicos
         # De esta forma, se simula que cambian todos a la vez
         # Esta operación de update ya comprueba que los movimientos sean correctos
         #  y, si lo son, realiza el movimiento de los Sprites
+        if self.jugador.hp <= 0:
+            self.director.salirPrograma()
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)
         self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos)
