@@ -254,7 +254,7 @@ class Jugador(MiSprite):
         if plataforma == None:
             self.numPostura = SPRITE_SALTANDO_BAJANDO
         #Si esta colisionando entonces para
-        elif ((plataforma.rect.bottom >= self.rect.top and self.velocidady > 0)):
+        elif ((plataforma.rect.top >= self.rect.top and self.velocidady > 0)):
             self.velocidady = 0
             self.numPostura = SPRITE_QUIETO
             self.establecerPosicion((self.posicion[0], plataforma.posicion[1]))

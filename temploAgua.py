@@ -18,7 +18,7 @@ MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 MINIMO_Y_JUGADOR = 100
 MAXIMO_Y_JUGADOR = ALTO_PANTALLA - MINIMO_Y_JUGADOR
 MAXIMO_Y = -1000
-MAXIMO_X = 3200
+MAXIMO_X = 3250
 
 # -------------------------------------------------
 # Clase Fase
@@ -91,7 +91,7 @@ class Agua(Escena):
                 self.scrollx = 0
 
                 # En su lugar, colocamos al jugador que esté más a la izquierda a la izquierda de todo
-                jugador.establecerPosicion((MINIMO_X_JUGADOR, jugador.posicion[1]))
+                jugador.establecerPosicion((MINIMO_X_JUGADOR - desplazamiento, jugador.posicion[1]))
                 
                 return False# No se ha actualizado el scroll
             else:
@@ -109,10 +109,9 @@ class Agua(Escena):
 
             # Si el escenario ya está a la derecha del todo, no lo movemos mas
             if self.scrollx + ANCHO_PANTALLA >= MAXIMO_X:
-                self.scrollx = self.decorado.rect.right - ANCHO_PANTALLA
 
                 # En su lugar, colocamos al jugador que esté más a la derecha a la derecha de todo
-                jugador.establecerPosicion((self.scrollx + MAXIMO_X_JUGADOR - jugador.rect.width, jugador.posicion[1]))
+                jugador.establecerPosicion((self.scrollx +  MAXIMO_X_JUGADOR - jugador.rect.width + desplazamiento, jugador.posicion[1]))
 
                 return False; # No se ha actualizado el scroll
             else:
@@ -133,8 +132,9 @@ class Agua(Escena):
             # Si el escenario ya está a la izquierda del todo, no lo movemos mas
             if self.scrolly <= MAXIMO_Y:
                 self.scrolly = MAXIMO_Y
+
                 # En su lugar, colocamos al jugador que esté más a la izquierda a la izquierda de todo
-                jugador.establecerPosicion((jugador.posicion[0], MINIMO_Y_JUGADOR))
+                jugador.establecerPosicion((jugador.posicion[0], MINIMO_Y_JUGADOR - desplazamiento))
                 
                 return False# No se ha actualizado el scroll
             else:
@@ -152,10 +152,9 @@ class Agua(Escena):
 
             # Si el escenario ya está a la derecha del todo, no lo movemos mas
             if self.scrolly + ALTO_PANTALLA >= -MAXIMO_Y:
-                self.scrolly = self.decorado.rect.bottom - ALTO_PANTALLA
 
                 # En su lugar, colocamos al jugador que esté más a la derecha a la derecha de todo
-                jugador.establecerPosicion((jugador.posicion[0], self.scrolly + MAXIMO_Y_JUGADOR - jugador.rect.height))
+                jugador.establecerPosicion((jugador.posicion[0],  self.scrolly +  MAXIMO_Y_JUGADOR - jugador.rect.height + desplazamiento))
 
                 return False; # No se ha actualizado el scroll
             else:
@@ -167,6 +166,7 @@ class Agua(Escena):
 
         # Si el jugador está en el limite de la pantalla
         return False
+
 
     
     def actualizarScroll(self, jugador):
