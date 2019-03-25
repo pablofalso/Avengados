@@ -38,6 +38,7 @@ class Agua(Escena):
         # Creamos el decorado y el fondo
         # Que parte del decorado estamos visualizando
         self.scrollx = 0
+        self.scrolly = 0
         self.distancia_scroll_derecha = ANCHO_PANTALLA/2
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
@@ -79,23 +80,32 @@ class Agua(Escena):
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
 
-    def actualizarScrollHorizontal(self,jugador, tiempo):
+    def actualizarScrollHorizontal(self, jugador, tiempo):
         if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2 and jugador.posicion[0] <= 3200 - ANCHO_PANTALLA/2):
-            print (jugador.velocidadx)
             self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
             return True
         if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0 and jugador.posicion[0] >= ANCHO_PANTALLA/2):
             self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
             return True
         return False
+   
+    def actualizarScrollVertical(self, jugador, tiempo):
+        if jugador.rect.top >= ALTO_PANTALLA/2:
+            self.scrolly += jugador.velocidady * tiempo
+            return True
+        if jugador.rect.bottom <= ALTO_PANTALLA/2 and self.scrolly >= 0 and jugador.posicion[1] >= ALTO_PANTALLA/2:
+            self.scrolly += jugador.velocidady * tiempo
+            return True
+        return False
 
     def actualizarScroll(self, jugador, tiempo):
-        cambioScroll = self.actualizarScrollHorizontal(jugador, tiempo)
+        cambioScroll = self.actualizarScrollHorizontal(jugador, tiempo) or self.actualizarScrollVertical(jugador, tiempo)
+        
         # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
         if cambioScroll:
             # Actualizamos la posición en pantalla de todos los Sprites según el scroll actual
             for sprite in iter(self.grupoSprites):
-                sprite.establecerPosicionPantalla((self.scrollx, 0))
+                sprite.establecerPosicionPantalla((self.scrollx, self.scrolly))
 
 
             # Ademas, actualizamos el decorado para que se muestre una parte distinta
