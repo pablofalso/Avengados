@@ -17,7 +17,7 @@ def listaCoordenadasPlataforma(xmldoc):
         x = int(res[i].attributes['x'].value)
         y = int(res[i].attributes['y'].value)
         z = int(res[i].attributes['z'].value)
-        lista.append([pygame.Rect(x, y, z-x-5, 5),z-x,5])
+        lista.append([pygame.Rect(x, y, z-5, 5),z,5])
     return lista
 
 def listaCoordenadasPared(xmldoc):
@@ -27,7 +27,7 @@ def listaCoordenadasPared(xmldoc):
         x = int(res[i].attributes['x'].value)
         y = int(res[i].attributes['y'].value)
         z = int(res[i].attributes['z'].value)
-        lista.append([pygame.Rect(x, y, 5, z-y-10),5,z-y+5])
+        lista.append([pygame.Rect(x, y, 5, z-y-5),5,z-y+5])
     return lista
 
 def listaCoordenadasPersonaje(tag, xmldoc):

@@ -79,18 +79,18 @@ class Agua(Escena):
 
     # Devuelve True o False según se ha tenido que desplazar el scroll
 
-    def actualizarScrollHorizontal(self,jugador):
+    def actualizarScrollHorizontal(self,jugador, tiempo):
         if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2 and jugador.posicion[0] <= 3200 - ANCHO_PANTALLA/2):
             print (jugador.velocidadx)
-            self.scrollx =  self.scrollx + 3
+            self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
             return True
         if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0 and jugador.posicion[0] >= ANCHO_PANTALLA/2):
-            self.scrollx =  self.scrollx - 3
+            self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
             return True
         return False
 
-    def actualizarScroll(self, jugador):
-        cambioScroll = self.actualizarScrollHorizontal(jugador)
+    def actualizarScroll(self, jugador, tiempo):
+        cambioScroll = self.actualizarScrollHorizontal(jugador, tiempo)
         # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
         if cambioScroll:
             # Actualizamos la posición en pantalla de todos los Sprites según el scroll actual
@@ -111,7 +111,7 @@ class Agua(Escena):
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)
         self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos)
-        self.actualizarScroll(self.jugador)
+        self.actualizarScroll(self.jugador, tiempo)
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)
 
