@@ -90,62 +90,27 @@ class Aire(Escena):
            return True
        return False
 
-    def actualizarScrollVertical(self, jugador):
-        # Si el jugador de la izquierda se encuentra más allá del borde izquierdo
-        if jugador.rect.top < MINIMO_Y_JUGADOR:
-            desplazamiento = MINIMO_Y_JUGADOR - jugador.rect.top
+    def actualizarScrollVertical(self, jugador, tiempo):
 
-            # Si el escenario ya está a la izquierda del todo, no lo movemos mas
-            if self.scrolly <= MAXIMO_Y:
-                self.scrolly = MAXIMO_Y
-
-                # En su lugar, colocamos al jugador que esté más a la izquierda a la izquierda de todo
-                jugador.establecerPosicion((jugador.posicion[0], MINIMO_Y_JUGADOR - desplazamiento))
-
-                return False# No se ha actualizado el scroll
-            else:
-                # Calculamos el nivel de scroll actual: el anterior - desplazamiento
-                #  (desplazamos a la izquierda)
-                self.scrolly = self.scrolly - desplazamiento
-
-                return True; # Se ha actualizado el scroll
-
-        # Si el jugador de la derecha se encuentra más allá del borde derecho
-        if (jugador.rect.bottom > MAXIMO_Y_JUGADOR):
-
-            # Se calcula cuantos pixeles esta fuera del borde
-            desplazamiento = jugador.rect.bottom - MAXIMO_Y_JUGADOR
-
-            # Si el escenario ya está a la derecha del todo, no lo movemos mas
-            if self.scrolly + ALTO_PANTALLA >= -MAXIMO_Y:
-
-                # En su lugar, colocamos al jugador que esté más a la derecha a la derecha de todo
-                jugador.establecerPosicion((jugador.posicion[0],  self.scrolly +  MAXIMO_Y_JUGADOR - jugador.rect.height + desplazamiento))
-
-                return False; # No se ha actualizado el scroll
-            else:
-                # Calculamos el nivel de scroll actual: el anterior + desplazamiento
-                #  (desplazamos a la derecha)
-                self.scrolly = self.scrolly + desplazamiento
-
-                return True # Se ha actualizado el scroll
-
-        # Si el jugador está en el limite de la pantalla
+        if (jugador.rect.top <= ALTO_PANTALLA/2 or jugador.rect.bottom >= ALTO_PANTALLA/2):
+            self.scrolly =  self.scrolly + jugador.velocidady * tiempo
+            return True
         return False
 
 
 
     def actualizarScroll(self, jugador, tiempo):
-        cambioScroll = self.actualizarScrollHorizontal(jugador, tiempo) or self.actualizarScrollVertical(jugador)
+        cambioScrollH = self.actualizarScrollHorizontal(jugador, tiempo)
+        cambioScrollV = self.actualizarScrollVertical(jugador, tiempo)
 
         # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
-        if cambioScroll:
+        if cambioScrollH or cambioScrollV:
             # Actualizamos la posición en pantalla de todos los Sprites según el scroll actual
             for sprite in iter(self.grupoSprites):
                 sprite.establecerPosicionPantalla((self.scrollx, self.scrolly))
 
             # Ademas, actualizamos el decorado para que se muestre una parte distinta
-            self.decorado.update(self.scrollx)
+            #self.decorado.update(self.scrollx)
 
 
     def update(self,tiempo):
