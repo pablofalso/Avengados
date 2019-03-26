@@ -3,7 +3,6 @@
     <coordenadasPersonajes>
         <Mike x="0" y="450"/>
 
-        <EnemigoComun x="1100" y="300"/>
     </coordenadasPersonajes>
 
     <coordenadasPlataformas>
@@ -11,7 +10,12 @@
         <plataforma x="300" y="350" z="100"/>
         <plataforma x="500" y="300" z="100"/>
         <plataforma x="700" y="250" z="100"/>
-        <plataforma x="900" y="200" z="1000"/>
+        <plataforma x="900" y="200" z="700"/>
+        <plataforma x="800" y="125" z="50"/>
+        <plataforma x="600" y="60" z="100"/>
+        <plataforma x="0" y="-10" z="500"/>
+        <plataforma x="1500" y="125" z="100"/>
+        <plataforma x="1500" y="25" z="100"/>
 
 
 
@@ -20,5 +24,7 @@
 
     <coordenadasParedes>
       <pared x="200" y="455" z="600"/>
+      <pared x="900" y="205" z="600"/>
+      <pared x="1600" y="0" z="200"/>
     </coordenadasParedes>
 </data>

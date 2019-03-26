@@ -81,48 +81,15 @@ class Agua(Escena):
         # Creamos otro grupo con todos los Sprites
         self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes)
 
-    def actualizarScrollHorizontal(self, jugador):
-        # Si el jugador de la izquierda se encuentra más allá del borde izquierdo
-        if jugador.rect.left < MINIMO_X_JUGADOR:
-            desplazamiento = MINIMO_X_JUGADOR - jugador.rect.left
-
-            # Si el escenario ya está a la izquierda del todo, no lo movemos mas
-            if self.scrollx <= 0:
-                self.scrollx = 0
-
-                # En su lugar, colocamos al jugador que esté más a la izquierda a la izquierda de todo
-                jugador.establecerPosicion((MINIMO_X_JUGADOR - desplazamiento, jugador.posicion[1]))
-                
-                return False# No se ha actualizado el scroll
-            else:
-                # Calculamos el nivel de scroll actual: el anterior - desplazamiento
-                #  (desplazamos a la izquierda)
-                self.scrollx = self.scrollx - desplazamiento
-
-                return True; # Se ha actualizado el scroll
-        
-        # Si el jugador de la derecha se encuentra más allá del borde derecho
-        if (jugador.rect.right > MAXIMO_X_JUGADOR):
-
-            # Se calcula cuantos pixeles esta fuera del borde
-            desplazamiento = jugador.rect.right - MAXIMO_X_JUGADOR
-
-            # Si el escenario ya está a la derecha del todo, no lo movemos mas
-            if self.scrollx + ANCHO_PANTALLA >= MAXIMO_X:
-
-                # En su lugar, colocamos al jugador que esté más a la derecha a la derecha de todo
-                jugador.establecerPosicion((self.scrollx +  MAXIMO_X_JUGADOR - jugador.rect.width + desplazamiento, jugador.posicion[1]))
-
-                return False; # No se ha actualizado el scroll
-            else:
-                # Calculamos el nivel de scroll actual: el anterior + desplazamiento
-                #  (desplazamos a la derecha)
-                self.scrollx = self.scrollx + desplazamiento
-
-                return True # Se ha actualizado el scroll
-
-        # Si el jugador está en el limite de la pantalla
-        return False
+    def actualizarScrollHorizontal(self,jugador, tiempo):
+       if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2 and jugador.posicion[0] <= 3200 - ANCHO_PANTALLA/2):
+           print (jugador.velocidadx)
+           self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
+           return True
+       if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0 and jugador.posicion[0] >= ANCHO_PANTALLA/2):
+           self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
+           return True
+       return False
 
     def actualizarScrollVertical(self, jugador):
         # Si el jugador de la izquierda se encuentra más allá del borde izquierdo
@@ -135,7 +102,7 @@ class Agua(Escena):
 
                 # En su lugar, colocamos al jugador que esté más a la izquierda a la izquierda de todo
                 jugador.establecerPosicion((jugador.posicion[0], MINIMO_Y_JUGADOR - desplazamiento))
-                
+
                 return False# No se ha actualizado el scroll
             else:
                 # Calculamos el nivel de scroll actual: el anterior - desplazamiento
@@ -143,7 +110,7 @@ class Agua(Escena):
                 self.scrolly = self.scrolly - desplazamiento
 
                 return True; # Se ha actualizado el scroll
-        
+
         # Si el jugador de la derecha se encuentra más allá del borde derecho
         if (jugador.rect.bottom > MAXIMO_Y_JUGADOR):
 
@@ -168,9 +135,9 @@ class Agua(Escena):
         return False
 
 
-    
-    def actualizarScroll(self, jugador):
-        cambioScroll = self.actualizarScrollHorizontal(jugador) or self.actualizarScrollVertical(jugador)
+
+    def actualizarScroll(self, jugador, tiempo):
+        cambioScroll = self.actualizarScrollHorizontal(jugador, tiempo) or self.actualizarScrollVertical(jugador)
 
         # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
         if cambioScroll:
@@ -181,7 +148,7 @@ class Agua(Escena):
             # Ademas, actualizamos el decorado para que se muestre una parte distinta
             self.decorado.update(self.scrollx)
 
-            
+
 
     def update(self,tiempo):
         # Actualizamos los Sprites dinamicos
@@ -193,7 +160,7 @@ class Agua(Escena):
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)
         self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos)
-        self.actualizarScroll(self.jugador)
+        self.actualizarScroll(self.jugador, tiempo)
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)
 
