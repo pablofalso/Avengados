@@ -83,7 +83,6 @@ class Agua(Escena):
 
     def actualizarScrollHorizontal(self,jugador, tiempo):
        if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2 and jugador.posicion[0] <= 3200 - ANCHO_PANTALLA/2):
-           print (jugador.velocidadx)
            self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
            return True
        if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0 and jugador.posicion[0] >= ANCHO_PANTALLA/2):

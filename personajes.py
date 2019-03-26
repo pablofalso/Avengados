@@ -3,7 +3,8 @@ from pygame.locals import *
 from gestorRecursos import *
 
 HP = 3
-CD_RECIBIRDANO = 1500
+CD_RECIBIR_DAÑO = 1500
+
 # Movimientos
 QUIETO = 0
 IZQUIERDA = 1
@@ -40,12 +41,29 @@ DURACION_DASH = 100 # En milisegundos
 
 
 #Valores para el enemigo
+#Movimientos
+ENEMIGO_MOVIENDOSE = 1
+ENEMIGO_CAYENDO = 2
+ENEMIGO_ATACANDO = 3
+ENEMIGO_MUERTO = 4
 
-ENEMIGO_MOVIENDOSE = 0
-ENEMIGO_CAYENDO = 1
-ENEMIGO_QUIETO = 2
+#Sprites
+SPRITE_ENEMIGO_MOVIENDOSE = 0
+SPRITE_ENEMIGO_CAYENDO = 1
+SPRITE_ENEMIGO_ATACANDO = 2
+SPRITE_ENEMIGO_MUERTO = 3
 
+#Retardo
+RETARDO_ENEMIGO_MOVIENDOSE = 6
+RETARDO_ENEMIGO_CAYENDO = 10
+RETARDO_ENEMIGO_ATACANDO = 10
+RETARDO_ENEMIGO_MUERTO = 15
 
+VELOCIDAD_ENEMIGO = 0.08
+GRAVEDAD = 0.003
+DISTANCIA_AGGRO = 200
+DISTANCIA_ATAQUE = 50
+CD_ATAQUE_ENEMIGO = 1000
 
 # Clase MiSprite
 class MiSprite(pygame.sprite.Sprite):
@@ -168,6 +186,9 @@ class Jugador(MiSprite):
             if self.numImagenPostura < 0:
                 self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
             self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+            
+            self.rect.height = self.coordenadasHoja[self.numPostura][self.numImagenPostura][3] + 5
+            self.rect.width = self.coordenadasHoja[self.numPostura][self.numImagenPostura][2]
             # Si esta mirando a la izquiera, cogemos la porcion de la hoja
             if self.mirando == DERECHA:
                 self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
@@ -236,13 +257,14 @@ class Jugador(MiSprite):
 
 
     def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
-        enemigos = pygame.sprite.spritecollideany(self, grupoEnemigos)
-        if enemigos != None:
-            if self.movimiento != ATAQUE and pygame.time.get_ticks() - self.ultimo_golpe > CD_RECIBIRDANO:
-                self.ultimo_golpe = pygame.time.get_ticks()
-                self.hp -= 1
+        enemigo = pygame.sprite.spritecollideany(self, grupoEnemigos)
+        if enemigo != None:
+            if self.movimiento != ATAQUE and pygame.time.get_ticks() - self.ultimo_golpe > CD_RECIBIR_DAÑO:
+                if enemigo.movimiento == ENEMIGO_ATACANDO:
+                    self.ultimo_golpe = pygame.time.get_ticks()
+                    self.hp -= 1
                 if self.hp == 0:
-                    print('LA PALMASTE BOY')
+                    self.numPostura = SPRITE_MUERTO
         if self.posicion[0] <= 0:
             self.establecerPosicion((2, self.posicion[1]))
         if self.posicion[0] > 3200:
@@ -288,10 +310,6 @@ class Jugador(MiSprite):
             self.velocidadx = 0
         if self.movimiento == ATAQUE:
                self.numPostura = SPRITE_ATAQUE_MELEE
-               enemigo = pygame.sprite.spritecollideany(self, grupoEnemigos)
-               if (enemigo != None):
-                   #enemigo.numPostura = 1
-                   enemigo.kill()
                self.velocidadx = 0
         if self.movimiento == DASH:
             self.numPostura = SPRITE_DASH
@@ -323,7 +341,7 @@ class Enemigo(MiSprite):
         # Lado hacia el que esta mirando
         self.mirando = IZQUIERDA
         self.atacando = False
-        self.dasheando = False
+        self.timer_ataque = 0
         self.empezar_andar = 0
         self.velocidadx = 0
         self.scroll=(0,0)
@@ -333,9 +351,9 @@ class Enemigo(MiSprite):
         self.numPostura = 1
         self.numImagenPostura = 0
         cont = 0
-        numImagenes = [10,4,6,6]
+        numImagenes = [10, 4, 6, 5]
         self.coordenadasHoja = []
-        #for linea in range(0, n): para n movimientos
+
         for linea in range(0, 4):
             self.coordenadasHoja.append([])
             tmp = self.coordenadasHoja[linea]
@@ -347,7 +365,7 @@ class Enemigo(MiSprite):
         self.retardoMovimiento = 0
 
         # En que postura esta inicialmente
-        self.numPostura = ENEMIGO_MOVIENDOSE
+        self.numPostura = SPRITE_ENEMIGO_MOVIENDOSE
 
         # La posicion inicial del Sprite
         self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
@@ -365,19 +383,25 @@ class Enemigo(MiSprite):
         self.retardoMovimiento -= 1
         # Miramos si ha pasado el retardo para dibujar una nueva posturaQUIETO
         if (self.retardoMovimiento < 0):
-            if self.numPostura == ENEMIGO_QUIETO:
-                self.retardoMovimiento = RETARDO_ANIMACION_QUIETO
-            elif self.numPostura == ENEMIGO_MOVIENDOSE:
-                self.retardoMovimiento = 2
-            elif self.numPostura == ENEMIGO_CAYENDO:
-                self.retardoMovimiento = 10
+            if self.numPostura == SPRITE_ENEMIGO_MOVIENDOSE:
+                self.retardoMovimiento = RETARDO_ENEMIGO_MOVIENDOSE
+            elif self.numPostura == SPRITE_ENEMIGO_CAYENDO:
+                self.retardoMovimiento = RETARDO_ENEMIGO_CAYENDO
+            elif self.numPostura == SPRITE_ENEMIGO_ATACANDO:
+                self.retardoMovimiento = RETARDO_ENEMIGO_ATACANDO
+            elif self.numPostura == SPRITE_ENEMIGO_MUERTO:
+                self.retardoMovimiento = RETARDO_ENEMIGO_MUERTO
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
                 self.numImagenPostura = 0
+                if self.numPostura == SPRITE_ENEMIGO_MUERTO:
+                    self.kill()
             if self.numImagenPostura < 0:
                 self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
             self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+            self.rect.height = self.coordenadasHoja[self.numPostura][self.numImagenPostura][3] + 5
+            self.rect.width = self.coordenadasHoja[self.numPostura][self.numImagenPostura][2]
             # Si esta mirando a la izquiera, cogemos la porcion de la hoja
             if self.mirando == DERECHA:
                 self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
@@ -388,33 +412,46 @@ class Enemigo(MiSprite):
     def mover(self, jugador):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         # La animación de atacando no se puede interrumpir
-        if (pygame.sprite.collide_rect(self, jugador)):
-            if jugador.movimiento == ATAQUE:
-                self.remove()
-        if (abs(self.posicion[0]-jugador.posicion[0]) <= 200):
-            if (self.posicion[0] > jugador.posicion[0]):
-                self.mirando = IZQUIERDA
-                self.movimiento = IZQUIERDA
-            else:
-                self.mirando = DERECHA
-                self.movimiento = DERECHA
-        elif (abs(self.posicion[0]-jugador.posicion[0]) <= 10):
-            if (self.posicion[0] > jugador.posicion[0]):
-                self.mirando = IZQUIERDA
-                self.movimiento = IZQUIERDA
-            else:
-                self.mirando = DERECHA
-                self.movimiento = DERECHA
-            #self.movimiento = ATAQUE_ENEMIGO
-        else:
-            if (pygame.time.get_ticks() - self.empezar_andar >= 1000):
-                if self.mirando == 1:
-                    self.mirando = DERECHA
-                    self.movimiento = DERECHA
-                else:
+        if not self.movimiento == ENEMIGO_MUERTO:
+            if (pygame.sprite.collide_rect(self, jugador)):
+                matar = False
+                if (self.posicion[0] > jugador.posicion[0] and jugador.mirando ==  DERECHA):
+                    matar = True
+                elif (self.posicion[0] < jugador.posicion[0] and jugador.mirando ==  IZQUIERDA):
+                    matar = True
+                if matar and jugador.movimiento == ATAQUE:
+                        self.numPostura = SPRITE_ENEMIGO_MUERTO
+                        self.movimiento = ENEMIGO_MUERTOa
+                        self.numImagenPostura = 0
+                        self.retardoMovimiento = 0
+                        self.velocidadx = 0
+            distancia_al_jugador = abs(self.posicion[0] - jugador.posicion[0])
+            if (distancia_al_jugador <= DISTANCIA_ATAQUE):
+                if (pygame.time.get_ticks() - self.timer_ataque > CD_ATAQUE_ENEMIGO):
+                    self.movimiento = ENEMIGO_ATACANDO
+                    self.numImagenPostura = 0
+                    self.retardoMovimiento = 0
+                    self.numPostura = SPRITE_ENEMIGO_ATACANDO
+                    self.atacando = True
+                    self.timer_ataque = pygame.time.get_ticks()
+                    if (self.posicion[0] > jugador.posicion[0]):
+                        self.mirando = IZQUIERDA
+                    else:
+                        self.mirando = DERECHA
+            elif (distancia_al_jugador <= DISTANCIA_AGGRO):
+                self.movimiento = ENEMIGO_MOVIENDOSE
+                if (self.posicion[0] > jugador.posicion[0]):
                     self.mirando = IZQUIERDA
-                    self.movimiento = IZQUIERDA
-                self.empezar_andar = pygame.time.get_ticks()
+                else:
+                    self.mirando = DERECHA
+            else:
+                if (pygame.time.get_ticks() - self.empezar_andar >= 1000):
+                    self.movimiento = ENEMIGO_MOVIENDOSE
+                    if self.mirando == IZQUIERDA:
+                        self.mirando = DERECHA
+                    else:
+                        self.mirando = IZQUIERDA
+                    self.empezar_andar = pygame.time.get_ticks()
 
 
 
@@ -424,11 +461,13 @@ class Enemigo(MiSprite):
         pared  = pygame.sprite.spritecollideany(self, grupoParedes)
         #Primero se mira si está encima de una plataforma, si no está cae
         if plataforma == None:
-            self.numPostura = ENEMIGO_CAYENDO
+            self.numPostura = SPRITE_ENEMIGO_CAYENDO
+            self.movimiento = ENEMIGO_CAYENDO
         #Si esta colisionando entonces para
-        elif ((plataforma.rect.bottom >= self.rect.top and self.velocidady > 0)):
+        elif ((plataforma.rect.top >= self.rect.top and self.velocidady > 0)):
             self.velocidady = 0
-            self.numPostura = SPRITE_QUIETO
+            self.numPostura = SPRITE_ENEMIGO_MOVIENDOSE
+            self.movimiento = ENEMIGO_MOVIENDOSE
             self.establecerPosicion((self.posicion[0], plataforma.posicion[1]))
         if pared != None:
             if (self.mirando == IZQUIERDA):
@@ -436,17 +475,22 @@ class Enemigo(MiSprite):
             else:
                 if (self.posicion[0] < pared.posicion[0]):
                     self.establecerPosicion((pared.posicion[0]-45, self.posicion[1]))
-        if self.movimiento == IZQUIERDA or self.movimiento == DERECHA:
-            if not (self.numPostura == ENEMIGO_CAYENDO):
-                self.numPostura = ENEMIGO_MOVIENDOSE
+        if self.movimiento == ENEMIGO_MOVIENDOSE:
+            if not (self.numPostura == SPRITE_ENEMIGO_CAYENDO):
+                self.numPostura = SPRITE_ENEMIGO_MOVIENDOSE
             # Si vamos a la izquierda, le ponemos velocidad en esa dirección
-            if self.movimiento == IZQUIERDA:
-                self.velocidadx = -0.1
+            if self.mirando == IZQUIERDA:
+                self.velocidadx = -VELOCIDAD_ENEMIGO
             # Si vamos a la derecha, le ponemos velocidad en esa dirección
             else:
-                self.velocidadx = 0.1
-        if self.numPostura == ENEMIGO_CAYENDO:
-            self.velocidady+=0.008
+                self.velocidadx = VELOCIDAD_ENEMIGO
+        elif self.movimiento == ENEMIGO_ATACANDO:
+            if not (self.numPostura == SPRITE_ENEMIGO_CAYENDO):
+                self.numPostura = SPRITE_ENEMIGO_ATACANDO
+                self.velocidadx = 0
+        
+        if self.numPostura == SPRITE_ENEMIGO_CAYENDO:
+            self.velocidady += GRAVEDAD
 
 
         self.actualizarPostura()
