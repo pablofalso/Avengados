@@ -16,7 +16,22 @@
         <plataforma x="0" y="-10" z="500"/>
         <plataforma x="1500" y="125" z="100"/>
         <plataforma x="1500" y="25" z="100"/>
+        <plataforma x="1450" y="-75" z="150"/>
+        <plataforma x="1450" y="-175" z="150"/>
+        <plataforma x="1450" y="-275" z="150"/>
+        <plataforma x="850" y="-100" z="105"/>
+        <plataforma x="950" y="-50" z="500"/>
+        <plataforma x="950" y="-275" z="500"/>
 
+        <plataforma x="1375" y="-350" z="100"/>
+
+        <plataforma x="1300" y="-450" z="100"/>
+        <plataforma x="1500" y="-500" z="100"/>
+        <plataforma x="1200" y="-550" z="100"/>
+        <plataforma x="1400" y="-650" z="100"/>
+        <plataforma x="1600" y="-650" z="200"/>
+
+        <plataforma x="1800" y="-520" z="150"/>
 
 
 
@@ -25,6 +40,11 @@
     <coordenadasParedes>
       <pared x="200" y="455" z="600"/>
       <pared x="900" y="205" z="600"/>
-      <pared x="1600" y="0" z="200"/>
+      <pared x="1600" y="-650" z="200"/>
+      <pared x="1450" y="-275" z="-50"/>
+      <pared x="950" y="-270" z="-185"/>
+      <pared x="950" y="-95" z="-50"/>
+      <pared x="1800" y="-650" z="-520"/>
+
     </coordenadasParedes>
 </data>
