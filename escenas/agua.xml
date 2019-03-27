@@ -2,7 +2,7 @@
 <data>
     <coordenadasPersonajes>
         <Mike x="0" y="300"/>
-
+        <Kriss x="100" y="300"/>
         <EnemigoComun x="1100" y="300"/>
     </coordenadasPersonajes>
 

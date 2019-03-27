@@ -65,6 +65,26 @@ DISTANCIA_AGGRO = 200
 DISTANCIA_ATAQUE = 50
 CD_ATAQUE_ENEMIGO = 1000
 
+#VALORES DE KRISS
+
+HP_KRISS = 1
+CD_ATAQUE_KRISS = 5000
+CD_KRISS_RECIBIR_DAÑO = 1000
+#Movimientos
+KRISS_QUIETO = 0
+KRISS_MUERTO = 1
+KRISS_ATAQUE = 2
+
+#Sprites
+SPRITE_KRISS_QUIETO = 0
+SPRITE_KRISS_MUERTO = 1
+SPRITE_KRISS_ATAQUE = 2
+
+#Retardos
+RETARDO_KRISS_QUIETO = 40
+RETARDO_KRISS_MUERTO = 20
+RETARDO_KRISS_ATAQUE = 8
+
 # Clase MiSprite
 class MiSprite(pygame.sprite.Sprite):
     def __init__(self):
@@ -233,6 +253,33 @@ class Jugador(MiSprite):
             self.movimiento = ATAQUE_DISTANCIA
             self.atacando_distancia = True
             self.numImagenPostura = 0
+        elif teclasPulsadas[arriba] and teclasPulsadas[izquierda]:
+            # Si estamos en el aire y han pulsado arriba
+            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                # y solo se ha realizado un salto sin tocar el suelo
+
+                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    self.movimiento = ARRIBA
+                    self.dobleSalto_segundoSalto = True
+                else:
+                    self.movimiento =  IZQUIERDA
+            else:
+                self.movimiento = ARRIBA
+                self.keyUp_suelta = False
+        elif teclasPulsadas[arriba] and teclasPulsadas[derecha]:
+            # Si estamos en el aire y han pulsado arriba
+            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                # y solo se ha realizado un salto sin tocar el suelo
+                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    self.movimiento = ARRIBA
+                    self.dobleSalto_segundoSalto = True
+                else:
+                    self.movimiento =  DERECHA
+            else:
+                self.movimiento = ARRIBA
+                self.keyUp_suelta = False
         elif teclasPulsadas[arriba]:
             self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
@@ -327,7 +374,120 @@ class Jugador(MiSprite):
         return
 
 
-#Empieza la clase del enemigo
+
+class Kriss(MiSprite):
+    "Kriss Ghemsguorz"
+    def __init__(self):
+        # Primero invocamos al constructor de la clase padre
+        pygame.sprite.Sprite.__init__(self)
+        # Se carga la hoja
+        self.hoja = GestorRecursos.CargarImagen('Kriss.png',-1)
+        self.hoja = self.hoja.convert_alpha()
+        # El movimiento que esta realizando
+        self.movimiento = KRISS_QUIETO
+        # Lado hacia el que esta mirando
+        self.mirando = IZQUIERDA
+        self.velocidadx = 0
+        self.velocidady = 0
+        self.scroll=(0,0)
+        self.vida = HP_KRISS
+        self.dañorecibido = 0
+        self.tiempo_ataque = 0
+        # Leemos las coordenadas de un archivo de texto
+        datos = GestorRecursos.CargarArchivoCoordenadas('coordenadasKriss.txt')
+        datos = datos.split()
+        self.numPostura = 1
+        self.numImagenPostura = 0
+        cont = 0
+        numImagenes = [2, 4, 10]
+        self.coordenadasHoja = []
+
+        for linea in range(0, 3):
+            self.coordenadasHoja.append([])
+            tmp = self.coordenadasHoja[linea]
+            for postura in range(1, numImagenes[linea]+1):
+                tmp.append(pygame.Rect((int(datos[cont]), int(datos[cont+1])), (int(datos[cont+2]), int(datos[cont+3]))))
+                cont += 4
+
+        # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
+        self.retardoMovimiento = 0
+
+        # En que postura esta inicialmente
+        self.numPostura = SPRITE_KRISS_QUIETO
+
+        # La posicion inicial del Sprite
+        self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
+        
+        # Y actualizamos la postura del Sprite inicial, llamando al metodo correspondiente
+        self.actualizarPostura()
+
+    def actualizarPostura(self):
+        self.retardoMovimiento -= 1
+        # Miramos si ha pasado el retardo para dibujar una nueva posturaQUIETO
+        if (self.retardoMovimiento < 0):
+            if self.numPostura == SPRITE_KRISS_QUIETO:
+                self.retardoMovimiento = RETARDO_KRISS_QUIETO
+            elif self.numPostura == SPRITE_KRISS_MUERTO:
+                self.retardoMovimiento = RETARDO_KRISS_MUERTO
+            elif self.numPostura == SPRITE_KRISS_ATAQUE:
+                self.retardoMovimiento = RETARDO_KRISS_ATAQUE
+            # Si ha pasado, actualizamos la postura
+            self.numImagenPostura += 1
+            if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
+                self.numImagenPostura = 0
+                if self.movimiento == KRISS_MUERTO:
+                    self.kill()
+                elif self.movimiento == KRISS_ATAQUE:
+                    self.movimiento = KRISS_QUIETO
+            if self.numImagenPostura < 0:
+                self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
+            self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+            self.rect.height = self.coordenadasHoja[self.numPostura][self.numImagenPostura][3] + 5
+            self.rect.width = self.coordenadasHoja[self.numPostura][self.numImagenPostura][2]
+            # Si esta mirando a la izquiera, cogemos la porcion de la hoja
+            if self.mirando == DERECHA:
+                self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+            #  Si no, si mira a la derecha, invertimos esa imagen
+            elif self.mirando == IZQUIERDA:
+                self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+
+    def mover(self, jugador):
+        if (pygame.sprite.collide_rect(self, jugador)):
+            recibir_daño = False
+            if (self.posicion[0] > jugador.posicion[0] and jugador.mirando ==  DERECHA):
+                recibir_daño = True
+            elif (self.posicion[0] < jugador.posicion[0] and jugador.mirando ==  IZQUIERDA):
+                recibir_daño = True
+            if recibir_daño and jugador.movimiento == ATAQUE and pygame.time.get_ticks() - self.dañorecibido > CD_KRISS_RECIBIR_DAÑO:
+                self.vida -= 1
+                self.dañorecibido = pygame.time.get_ticks()
+                if self.vida <= 0:
+                    self.numPostura = SPRITE_KRISS_MUERTO
+                    self.movimiento = KRISS_MUERTO
+                    self.numImagenPostura = 0
+                    self.retardoMovimiento = 0
+        elif not self.movimiento == KRISS_MUERTO:
+            if pygame.time.get_ticks() - self.tiempo_ataque > CD_ATAQUE_KRISS:
+                self.movimiento = KRISS_ATAQUE
+                self.numPostura = SPRITE_KRISS_ATAQUE
+                self.numImagenPostura = 0
+                self.retardoMovimiento = 0
+                self.tiempo_ataque = pygame.time.get_ticks()
+        if (self.posicion[0] > jugador.posicion[0]):
+            self.mirando = IZQUIERDA
+        else:
+            self.mirando = DERECHA
+
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
+        if self.movimiento == KRISS_QUIETO:
+            self.numPostura = SPRITE_KRISS_QUIETO
+        elif self.movimiento == KRISS_MUERTO:
+            self.numPostura = SPRITE_KRISS_MUERTO
+
+        self.actualizarPostura()
+        MiSprite.update(self,tiempo)
+        return
+
 class Enemigo(MiSprite):
     "Enemigo"
     def __init__(self):
@@ -421,7 +581,7 @@ class Enemigo(MiSprite):
                     matar = True
                 if matar and jugador.movimiento == ATAQUE:
                         self.numPostura = SPRITE_ENEMIGO_MUERTO
-                        self.movimiento = ENEMIGO_MUERTOa
+                        self.movimiento = ENEMIGO_MUERTO
                         self.numImagenPostura = 0
                         self.retardoMovimiento = 0
                         self.velocidadx = 0
@@ -496,7 +656,7 @@ class Enemigo(MiSprite):
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
         return
-
+        
 class BolaDeFuego(pygame.sprite.Sprite):
     "BolaDeFuego"
     def __init__(self, posicionx, posiciony):

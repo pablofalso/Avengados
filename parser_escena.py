@@ -7,7 +7,7 @@ def parse(fullname):
     return xmldoc
 
 def coordenadasPersonaje(tag, xmldoc):
-    res =  xmldoc.getElementsByTagName('plataforma')
+    res =  xmldoc.getElementsByTagName(tag)
     return (int(res[0].attributes['x'].value),int(res[0].attributes['y'].value))
 
 def listaCoordenadasPlataforma(xmldoc):
