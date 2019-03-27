@@ -143,6 +143,7 @@ class Jugador(pygame.sprite.Sprite):
         self.actualizarPostura()
 
     def actualizarPostura(self):
+        print("postura")
         self.retardoMovimiento -= 1
         # Miramos si ha pasado el retardo para dibujar una nueva postura
         if (self.retardoMovimiento < 0):
@@ -172,7 +173,36 @@ class Jugador(pygame.sprite.Sprite):
 
     def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
-        if teclasPulsadas[arriba]:
+        
+        elif teclasPulsadas[arriba] and teclasPulsadas[izquierda]:
+            # Si estamos en el aire y han pulsado arriba
+            
+            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                # y solo se ha realizado un salto sin tocar el suelo
+                
+                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    self.movimiento = ARRIBA
+                    self.dobleSalto_segundoSalto = True
+                else:
+                    self.movimiento =  IZQUIERDA
+            else:
+                self.movimiento = ARRIBA
+                self.keyUp_suelta = False
+        elif teclasPulsadas[arriba] and teclasPulsadas[derecha]:
+            # Si estamos en el aire y han pulsado arriba
+            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                # y solo se ha realizado un salto sin tocar el suelo
+                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    self.movimiento = ARRIBA
+                    self.dobleSalto_segundoSalto = True
+                else:
+                    self.movimiento =  DERECHA
+            else:
+                self.movimiento = ARRIBA
+                self.keyUp_suelta = False
+        elif teclasPulsadas[arriba]:
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
                 # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar

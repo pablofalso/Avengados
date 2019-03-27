@@ -182,6 +182,7 @@ class Jugador(MiSprite):
         self.actualizarPostura()
 
     def actualizarPostura(self):
+        print("postura")
         self.retardoMovimiento -= 1
         # Miramos si ha pasado el retardo para dibujar una nueva postura
         if (self.retardoMovimiento < 0):
@@ -281,6 +282,7 @@ class Jugador(MiSprite):
                 self.movimiento = ARRIBA
                 self.keyUp_suelta = False
         elif teclasPulsadas[arriba]:
+            print("salta a la derecha")
             self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
