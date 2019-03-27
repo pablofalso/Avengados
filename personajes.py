@@ -233,7 +233,35 @@ class Jugador(MiSprite):
             self.movimiento = ATAQUE_DISTANCIA
             self.atacando_distancia = True
             self.numImagenPostura = 0
+        elif teclasPulsadas[arriba] and teclasPulsadas[izquierda]:
+            # Si estamos en el aire y han pulsado arriba
+            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                # y solo se ha realizado un salto sin tocar el suelo
+                
+                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    self.movimiento = ARRIBA
+                    self.dobleSalto_segundoSalto = True
+                else:
+                    self.movimiento =  IZQUIERDA
+            else:
+                self.movimiento = ARRIBA
+                self.keyUp_suelta = False
+        elif teclasPulsadas[arriba] and teclasPulsadas[derecha]:
+            # Si estamos en el aire y han pulsado arriba
+            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                # y solo se ha realizado un salto sin tocar el suelo
+                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    self.movimiento = ARRIBA
+                    self.dobleSalto_segundoSalto = True
+                else:
+                    self.movimiento =  DERECHA
+            else:
+                self.movimiento = ARRIBA
+                self.keyUp_suelta = False
         elif teclasPulsadas[arriba]:
+            print("salta a la derecha")
             self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
@@ -421,7 +449,7 @@ class Enemigo(MiSprite):
                     matar = True
                 if matar and jugador.movimiento == ATAQUE:
                         self.numPostura = SPRITE_ENEMIGO_MUERTO
-                        self.movimiento = ENEMIGO_MUERTOa
+                        self.movimiento = ENEMIGO_MUERTO
                         self.numImagenPostura = 0
                         self.retardoMovimiento = 0
                         self.velocidadx = 0
