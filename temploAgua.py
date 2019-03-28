@@ -75,6 +75,10 @@ class Agua(Escena):
             enemigo.establecerPosicion(coordenadas)
             self.grupoEnemigos.add(enemigo)
 
+        self.kriss = Kriss()
+        self.kriss.establecerPosicion(parser_escena.coordenadasPersonaje('Kriss',self.xmldoc))
+        self.grupoEnemigos.add(self.kriss)
+
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos)
