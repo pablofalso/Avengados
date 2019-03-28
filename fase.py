@@ -41,9 +41,9 @@ class Fase(Escena):
 
         fullname = os.path.join('escenas', xml)
         self.xmldoc = parser_escena.parse(fullname)
-
+        self.textura = parser_escena.texturas(self.xmldoc)
         self.limitex, self.limitey = parser_escena.limites(self.xmldoc)
-        self.limite_inferior = Plataforma([pygame.Rect(0, self.limitey, self.limitex, 5),self.limitex, 5])
+        self.limite_inferior = Plataforma([pygame.Rect(0, self.limitey, self.limitex, 5),self.limitex, 5], self.textura)
         self.limite_derecha = Pared([pygame.Rect(self.limitex, 0, 5, self.limitey),5, self.limitey])
 
         # Creamos los sprites de los jugadores
@@ -55,12 +55,17 @@ class Fase(Escena):
         listaPlataformas = parser_escena.listaCoordenadasPlataforma(self.xmldoc)
         self.grupoPlataformas = pygame.sprite.Group()
         for coordenadas in listaPlataformas:
-            self.grupoPlataformas.add(Plataforma(coordenadas))
+            self.grupoPlataformas.add(Plataforma(coordenadas, self.textura))
 
         listaSuelo = parser_escena.listaCoordenadasSuelo(self.xmldoc)
         self.grupoSuelo = pygame.sprite.Group()
         for coordenadas in listaSuelo:
             self.grupoPlataformas.add(Suelo(coordenadas))
+
+        listaRelleno = parser_escena.listaCoordenadasRelleno(self.xmldoc)
+        self.grupoRelleno = pygame.sprite.Group()
+        for coordenadas in listaRelleno:
+            self.grupoPlataformas.add(Relleno(coordenadas, self.textura))
 
         # Creamos las paredes
         listaParedes = parser_escena.listaCoordenadasPared(self.xmldoc)
@@ -166,7 +171,7 @@ class Fase(Escena):
 
 #class Plataforma(pygame.sprite.Sprite):
 class Plataforma(MiSprite):
-    def __init__(self,plataforma):
+    def __init__(self,plataforma, textura):
         # Primero invocamos al constructor de la clase padre
         MiSprite.__init__(self)
         # Rectangulo con las coordenadas en pantalla que ocupara
@@ -176,7 +181,7 @@ class Plataforma(MiSprite):
         # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
         #self.image = pygame.Surface((plataforma[1], plataforma[2]))
         #test = GestorRecursos.CargarImagen('plat.png', -1)
-        self.image = pygame.image.load(os.path.join('imagenes','plat.png')).convert()
+        self.image = pygame.image.load(os.path.join('imagenes', textura)).convert()
         self.image = pygame.transform.scale(self.image, (self.rect.width, 15))
         self.image.convert_alpha()
         #self.image.blit(test, self.rect)
@@ -193,9 +198,28 @@ class Suelo(MiSprite):
         self.establecerPosicion((self.rect.left, self.rect.bottom))
         # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
         self.image = pygame.Surface((plataforma[1], plataforma[2]))
-        #test = GestorRecursos.CargarImagen('plat.png', -1)
+        #self.image = pygame.image.load(os.path.join('imagenes','wallTest.png')).convert()
+        #self.image = pygame.transform.scale(self.image, (400, 600))
+        #self.image.convert_alpha()
         #self.image.blit(test, self.rect)
         self.image.fill((0,0,0))
+
+
+class Relleno(MiSprite):
+    def __init__(self,plataforma, textura):
+        # Primero invocamos al constructor de la clase padre
+        MiSprite.__init__(self)
+        # Rectangulo con las coordenadas en pantalla que ocupara
+        self.rect = plataforma[0]
+        # Y lo situamos de forma global en esas coordenadas
+        self.establecerPosicion((self.rect.left, self.rect.bottom))
+        # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
+        #self.image = pygame.Surface((plataforma[1], plataforma[2]))
+        self.image = pygame.image.load(os.path.join('imagenes',textura)).convert()
+        self.image = pygame.transform.scale(self.image, (self.rect.height, self.rect.width))
+        self.image.convert_alpha()
+        #self.image.blit(test, self.rect)
+        #self.image.fill((0,0,0))
 
 
 class Pared(MiSprite):
@@ -207,8 +231,8 @@ class Pared(MiSprite):
         # Y lo situamos de forma global en esas coordenadas
         self.establecerPosicion((self.rect.left, self.rect.bottom))
         # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
-        self.image = pygame.Surface((plataforma[1], plataforma[2]))
-        self.image.fill((0,0,0))
+        self.image = pygame.Surface((0, 0))
+        #self.image.fill((0,0,0))
 
 class Decorado:
     def __init__(self):
