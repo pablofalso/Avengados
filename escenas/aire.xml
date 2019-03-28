@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data>
     <decorado name="backgroundAire.png"/>
-
+    <texturas name="texturaAire.png"/>
     <limitesMapa x="2150" y="700"/>
 
     <coordenadasPersonajes>
@@ -9,7 +9,7 @@
     </coordenadasPersonajes>
 
     <coordenadasPlataformas>
-        <plataforma x="0" y="450" z="205"/>
+
         <plataforma x="300" y="350" z="100"/>
         <plataforma x="500" y="300" z="100"/>
         <plataforma x="700" y="250" z="100"/>
@@ -50,6 +50,16 @@
       <pared x="1800" y="-650" z="-520"/>
 
     </coordenadasParedes>
+
+    <coordenadasSuelo>
+      <suelo x="0" y="450" z="205"/>
+      <suelo x="375" y="350" z="675"/>
+      <suelo x="1050" y="300" z="855"/>
+      <suelo x="1900" y="500" z="900"/>
+      <suelo x="2800" y="300" z="450"/>
+      <suelo x="1300" y="230" z="105"/>
+
+    </coordenadasSuelo>
 
 
   <coordenadasRelleno>

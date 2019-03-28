@@ -37,7 +37,7 @@ class Fase(Escena):
         self.distancia_scroll_derecha = ANCHO_PANTALLA/2
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
-        self.decorado = Decorado()
+
 
         fullname = os.path.join('escenas', xml)
         self.xmldoc = parser_escena.parse(fullname)
@@ -45,6 +45,8 @@ class Fase(Escena):
         self.limitex, self.limitey = parser_escena.limites(self.xmldoc)
         self.limite_inferior = Plataforma([pygame.Rect(0, self.limitey, self.limitex, 5),self.limitex, 5], self.textura)
         self.limite_derecha = Pared([pygame.Rect(self.limitex, 0, 5, self.limitey),5, self.limitey])
+        self.fondo = parser_escena.decorado(self.xmldoc)
+        self.decorado = Decorado(self.fondo)
 
         # Creamos los sprites de los jugadores
         self.jugador = Jugador(self.limite_inferior)
@@ -235,8 +237,8 @@ class Pared(MiSprite):
         #self.image.fill((0,0,0))
 
 class Decorado:
-    def __init__(self):
-        self.imagen = GestorRecursos.CargarImagen('backgroundTierra.png', -1)
+    def __init__(self, fondo):
+        self.imagen = GestorRecursos.CargarImagen(fondo, -1)
         self.imagen = pygame.transform.scale(self.imagen, (800, 600))
 
         self.rect = self.imagen.get_rect()
