@@ -10,6 +10,14 @@ def coordenadasPersonaje(tag, xmldoc):
     res =  xmldoc.getElementsByTagName(tag)
     return (int(res[0].attributes['x'].value),int(res[0].attributes['y'].value))
 
+def decorado(xmldoc):
+    res =  xmldoc.getElementsByTagName("decorado")
+    return res[0].attributes['name'].value
+
+def limites(xmldoc):
+    res = xmldoc.getElementsByTagName("limitesMapa")
+    return (int(res[0].attributes['x'].value),int(res[0].attributes['y'].value))
+    
 def listaCoordenadasPlataforma(xmldoc):
     res = xmldoc.getElementsByTagName('plataforma')
     lista = []

@@ -4,7 +4,7 @@
 # Importar modulos
 import pygame
 import director
-from director import *
+from director import Director
 from temploAgua import Agua
 from temploAire import Aire
 from temploTierra import Tierra

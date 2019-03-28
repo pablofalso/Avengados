@@ -14,6 +14,7 @@ ABAJO = 4
 ATAQUE = 5
 DASH = 6
 ATAQUE_DISTANCIA = 7
+MUERTO = 8
 
 #Posturas
 SPRITE_QUIETO = 0
@@ -23,6 +24,7 @@ SPRITE_SALTANDO_BAJANDO = 3
 SPRITE_ATAQUE_MELEE = 4
 SPRITE_DASH = 5
 SPRITE_ATAQUE_DISTANCIA = 6
+SPRITE_MUERTO = 7
 
 VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
@@ -35,6 +37,7 @@ RETARDO_ANIMACION_SALTANDO_BAJANDO = 7
 RETARDO_ANIMACION_ATAQUE_MELEE = 4
 RETARDO_ANIMACION_DASH = 7
 RETARDO_ANIMACION_ATAQUE_DISTANCIA = 7
+RETARDO_ANIMACION_MUERTO = 8
 
 CD_DASH = 500 # En milisegundos
 DURACION_DASH = 100 # En milisegundos
@@ -70,6 +73,7 @@ CD_ATAQUE_ENEMIGO = 1000
 HP_KRISS = 1
 CD_ATAQUE_KRISS = 5000
 CD_KRISS_RECIBIR_DAÑO = 1000
+
 #Movimientos
 KRISS_QUIETO = 0
 KRISS_MUERTO = 1
@@ -118,9 +122,10 @@ class MiSprite(pygame.sprite.Sprite):
 
 class Jugador(MiSprite):
     "Jugador"
-    def __init__(self):
+    def __init__(self, limite_inferior):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self)
+        self.limite_inferior = limite_inferior
         # Se carga la hoja
         self.hoja = GestorRecursos.CargarImagen('MikeSprite.png',-1)
         self.hoja = self.hoja.convert_alpha()
@@ -140,10 +145,10 @@ class Jugador(MiSprite):
         self.numPostura = 1
         self.numImagenPostura = 0
         cont = 0
-        numImagenes = [6,11,2,2,6,1,5]
+        numImagenes = [6,11,2,2,6,1,5,6]
         self.coordenadasHoja = []
         #for linea in range(0, n): para n movimientos
-        for linea in range(0, 7):
+        for linea in range(0, 8):
             self.coordenadasHoja.append([])
             tmp = self.coordenadasHoja[linea]
             for postura in range(1, numImagenes[linea]+1):
@@ -200,9 +205,14 @@ class Jugador(MiSprite):
                 self.retardoMovimiento = RETARDO_ANIMACION_DASH
             elif self.numPostura == SPRITE_ATAQUE_DISTANCIA:
                 self.retardoMovimiento = RETARDO_ANIMACION_ATAQUE_DISTANCIA
+            elif self.numPostura == SPRITE_MUERTO:
+                self.retardoMovimiento = RETARDO_ANIMACION_MUERTO
             # Si ha pasado, actualizamos la postura
             self.numImagenPostura += 1
             if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
+                if self.numPostura == SPRITE_MUERTO:
+                    pygame.time.wait(1000)
+                    self.hp = 0
                 self.numImagenPostura = 0
             if self.numImagenPostura < 0:
                 self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
@@ -220,99 +230,120 @@ class Jugador(MiSprite):
     def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha, ataque_melee, dash, ataque_distancia):
         # Indicamos la acción a realizar segun la tecla pulsada para el jugador
         # La animación de atacando no se puede interrumpir
-        if self.atacando:
-            if (self.numImagenPostura == 5):
-                self.movimiento = QUIETO
-                self.atacando = False
-        # La animación de dasheando no se puede interrumpir
-        elif self.dasheando:
-            if (pygame.time.get_ticks() - self.inicio_dash > DURACION_DASH):
-                self.movimiento = QUIETO
-                self.dasheando = False
-        elif self.atacando_distancia:
-            if (self.numImagenPostura == 4):
-                self.movimiento = QUIETO
-                self.atacando_distancia = False
-        # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
-        # Así puedes atacar sin soltar las teclas de movimiento
-        elif teclasPulsadas[ataque_melee]:
-            # Si estás en el aire, no puedes atacar
-            if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+        if not self.movimiento == MUERTO:
+            if self.atacando:
+                if (self.numImagenPostura == 5):
+                    self.movimiento = QUIETO
+                    self.atacando = False
+            # La animación de dasheando no se puede interrumpir
+            elif self.dasheando:
+                if (pygame.time.get_ticks() - self.inicio_dash > DURACION_DASH):
+                    self.movimiento = QUIETO
+                    self.dasheando = False
+            elif self.atacando_distancia:
+                if (self.numImagenPostura == 4):
+                    self.movimiento = QUIETO
+                    self.atacando_distancia = False
+            # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
+            # Así puedes atacar sin soltar las teclas de movimiento
+            elif teclasPulsadas[ataque_melee]:
+                # Si estás en el aire, no puedes atacar
+                if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+                    self.numImagenPostura = 0
+                    self.movimiento = ATAQUE
+                    self.atacando = True
+            elif teclasPulsadas[dash]:
+                if self.dash_desbloqueado:
+                    # Si estás en el aire, no puedes dashear
+                    #if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+                    if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
+                        self.movimiento = DASH
+                        self.dasheando = True
+                        self.inicio_dash = pygame.time.get_ticks()
+            elif teclasPulsadas[ataque_distancia]:
+                self.movimiento = ATAQUE_DISTANCIA
+                self.atacando_distancia = True
                 self.numImagenPostura = 0
-                self.movimiento = ATAQUE
-                self.atacando = True
-        elif teclasPulsadas[dash]:
-            if self.dash_desbloqueado:
-                # Si estás en el aire, no puedes dashear
-                #if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
-                if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
-                    self.movimiento = DASH
-                    self.dasheando = True
-                    self.inicio_dash = pygame.time.get_ticks()
-        elif teclasPulsadas[ataque_distancia]:
-            self.movimiento = ATAQUE_DISTANCIA
-            self.atacando_distancia = True
-            self.numImagenPostura = 0
-            self.fuego = True
-        elif teclasPulsadas[arriba] and teclasPulsadas[izquierda]:
-            # Si estamos en el aire y han pulsado arriba
-            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
-                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
-                # y solo se ha realizado un salto sin tocar el suelo
+                self.fuego = True
+            elif teclasPulsadas[arriba] and teclasPulsadas[izquierda]:
+                # Si estamos en el aire y han pulsado arriba
+                if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                    # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                    # y solo se ha realizado un salto sin tocar el suelo
 
-                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
-                    self.movimiento = ARRIBA
-                    self.dobleSalto_segundoSalto = True
+                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                        self.movimiento = ARRIBA
+                        self.dobleSalto_segundoSalto = True
+                    else:
+                        self.movimiento =  IZQUIERDA
                 else:
-                    self.movimiento =  IZQUIERDA
-            else:
-                self.movimiento = ARRIBA
-                self.keyUp_suelta = False
-        elif teclasPulsadas[arriba] and teclasPulsadas[derecha]:
-            # Si estamos en el aire y han pulsado arriba
-            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
-                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
-                # y solo se ha realizado un salto sin tocar el suelo
-                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
                     self.movimiento = ARRIBA
-                    self.dobleSalto_segundoSalto = True
+                    self.keyUp_suelta = False
+            elif teclasPulsadas[arriba] and teclasPulsadas[derecha]:
+                # Si estamos en el aire y han pulsado arriba
+                if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                    # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                    # y solo se ha realizado un salto sin tocar el suelo
+                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                        self.movimiento = ARRIBA
+                        self.dobleSalto_segundoSalto = True
+                    else:
+                        self.movimiento =  DERECHA
                 else:
-                    self.movimiento =  DERECHA
-            else:
-                self.movimiento = ARRIBA
-                self.keyUp_suelta = False
-        elif teclasPulsadas[arriba]:
-            self.keyUp_pulsada = True
-            # Si estamos en el aire y han pulsado arriba
-            if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
-                # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
-                # y solo se ha realizado un salto sin tocar el suelo
-                if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
                     self.movimiento = ARRIBA
-                    self.dobleSalto_segundoSalto = True
+                    self.keyUp_suelta = False
+            elif teclasPulsadas[arriba]:
+                self.keyUp_pulsada = True
+                # Si estamos en el aire y han pulsado arriba
+                if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
+                    # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
+                    # y solo se ha realizado un salto sin tocar el suelo
+                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                        self.movimiento = ARRIBA
+                        self.dobleSalto_segundoSalto = True
+                    else:
+                        self.movimiento =  QUIETO
                 else:
-                    self.movimiento =  QUIETO
+                    self.movimiento = ARRIBA
+                    self.keyUp_suelta = False
+            elif teclasPulsadas[izquierda]:
+                self.movimiento = IZQUIERDA
+            elif teclasPulsadas[derecha]:
+                self.movimiento = DERECHA
             else:
-                self.movimiento = ARRIBA
-                self.keyUp_suelta = False
-        elif teclasPulsadas[izquierda]:
-            self.movimiento = IZQUIERDA
-        elif teclasPulsadas[derecha]:
-            self.movimiento = DERECHA
-        else:
-            self.movimiento = QUIETO
+                self.movimiento = QUIETO
 
 
 
     def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+        if self.movimiento == MUERTO:
+            self.actualizarPostura()
+            MiSprite.update(self,tiempo)
+            return
+        if pygame.sprite.collide_rect(self, self.limite_inferior):
+            self.movimiento = MUERTO
+            self.numPostura = SPRITE_MUERTO
+            self.numImagenPostura = 0
+            self.velocidady = 0
+            self.actualizarPostura()
+            MiSprite.update(self,tiempo)
+            return
         enemigo = pygame.sprite.spritecollideany(self, grupoEnemigos)
         if enemigo != None:
             if self.movimiento != ATAQUE and pygame.time.get_ticks() - self.ultimo_golpe > CD_RECIBIR_DAÑO:
                 if enemigo.movimiento == ENEMIGO_ATACANDO:
                     self.ultimo_golpe = pygame.time.get_ticks()
-                    self.hp -= 1
-                if self.hp == 0:
-                    self.numPostura = SPRITE_MUERTO
+                    if self.hp == 1:
+                        self.numPostura = SPRITE_MUERTO
+                        self.movimiento = MUERTO
+                        self.numImagenPostura = 0
+                        self.velocidady = 0
+                        self.velocidadx = 0
+                        self.actualizarPostura()
+                        MiSprite.update(self,tiempo)
+                        return
+                    else:
+                        self.hp -= 1
         if self.posicion[0] <= 0:
             self.establecerPosicion((2, self.posicion[1]))
         if self.posicion[0] > 3200:
@@ -681,7 +712,7 @@ class BolaDeFuego(MiSprite):
         # Lado hacia el que esta mirando
         self.jugador=jugador
         pygame.time.Clock()
-        self.clock =pygame.time.get_ticks() 
+        self.clock = pygame.time.get_ticks() 
 
         if self.jugador.mirando == IZQUIERDA:
              self.velocidadx=-0.6
@@ -692,27 +723,12 @@ class BolaDeFuego(MiSprite):
 
         self.scroll=(0,0)
         self.posicion = (posicionx, posiciony)
-        # Leemos las coordenadas de un archivo de texto
-        datos = GestorRecursos.CargarArchivoCoordenadas('coordenadasMike.txt')
-        datos = datos.split()
-        self.numPostura = ATAQUE_DISTANCIA
-        self.numImagenPostura = 0
-        cont = 0
-        numImagenes = [6,11,2,2,6,1,5,1]
-        self.coordenadasHoja = []
-        #for linea in range(0, n): para n movimientos
-        for linea in range(0, 8):
-            self.coordenadasHoja.append([])
-            tmp = self.coordenadasHoja[linea]
-            for postura in range(1, numImagenes[linea]+1):
-                tmp.append(pygame.Rect((int(datos[cont]), int(datos[cont+1])), (int(datos[cont+2]), int(datos[cont+3]))))
-                cont += 4
-
+        self.coordenadasHoja = [125, 4750, 37, 21]
         # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
         self.retardoMovimiento = 0
 
         # La posicion inicial del Sprite
-        self.rect = pygame.Rect(posicionx, posiciony,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
+        self.rect = pygame.Rect(posicionx, posiciony,self.coordenadasHoja[2],self.coordenadasHoja[3])
 
         # La posicion x e y que ocupa
 
@@ -724,26 +740,12 @@ class BolaDeFuego(MiSprite):
         self.actualizarPostura()
 
     def actualizarPostura(self):
-        self.retardoMovimiento -= 1
-        # Miramos si ha pasado el retardo para dibujar una nueva postura
-        if (self.retardoMovimiento < 0):
-
-            self.numImagenPostura += 1
-            if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
-                self.numImagenPostura = 0
-            if self.numImagenPostura < 0:
-                self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
-            self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
-
-            self.rect.height = self.coordenadasHoja[self.numPostura][self.numImagenPostura][3] + 5
-            self.rect.width = self.coordenadasHoja[self.numPostura][self.numImagenPostura][2]
-            # Si esta mirando a la izquiera, cogemos la porcion de la hoja
-            if self.mirando == DERECHA:
-                self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
-                
-            #  Si no, si mira a la derecha, invertimos esa imagen
-            else:
-                self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+        if self.mirando == DERECHA:
+            self.image = self.hoja.subsurface(self.coordenadasHoja)
+            
+        #  Si no, si mira a la derecha, invertimos esa imagen
+        else:
+            self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
                 
 
     def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):

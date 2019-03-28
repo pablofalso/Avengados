@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data>
+    <decorado name="backgroundAire.png"/> 
+    
+    <limitesMapa x="3500" y="750"/>
+    
     <coordenadasPersonajes>
         <Mike x="0" y="300"/>
         <Kriss x="100" y="300"/>

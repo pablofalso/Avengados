@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data>
+    <decorado name="backgroundTierra.png"/>
+
+    <limitesMapa x="2000" y="1500"/>
     <coordenadasPersonajes>
         <Mike x="0" y="100"/>
 

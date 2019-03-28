@@ -11,14 +11,6 @@ import parser_escena
 # -------------------------------------------------
 # -------------------------------------------------
 
-# Los bordes de la pantalla para hacer scroll horizontal
-MINIMO_X_JUGADOR = 200
-MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
-MINIMO_Y_JUGADOR = 100
-MAXIMO_Y_JUGADOR = ALTO_PANTALLA - MINIMO_Y_JUGADOR
-MAXIMO_Y = -1000
-MAXIMO_X = 3250
-ATAQUE_DISTANCIA = 7
 # -------------------------------------------------
 # Clase Fase
 
@@ -46,12 +38,17 @@ class Fase(Escena):
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
         self.decorado = Decorado()
-        # Creamos los sprites de los jugadores
-        self.jugador = Jugador()
-        self.jugador.keyUp_pulsada = False
 
         fullname = os.path.join('escenas', xml)
         self.xmldoc = parser_escena.parse(fullname)
+
+        self.limitex, self.limitey = parser_escena.limites(self.xmldoc)
+        self.limite_inferior = Plataforma([pygame.Rect(0, self.limitey, self.limitex, 5),self.limitex, 5])
+        self.limite_derecha = Pared([pygame.Rect(self.limitex, 0, 5, self.limitey),5, self.limitey])
+
+        # Creamos los sprites de los jugadores
+        self.jugador = Jugador(self.limite_inferior)
+        self.jugador.keyUp_pulsada = False
         self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
 
         # Creamos las plataformas
@@ -122,6 +119,7 @@ class Fase(Escena):
         # Esta operación de update ya comprueba que los movimientos sean correctos
         #  y, si lo son, realiza el movimiento de los Sprites
         if self.jugador.hp <= 0:
+            pygame.time.wait(500)
             self.director.salirPrograma()
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)

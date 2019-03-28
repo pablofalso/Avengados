@@ -46,7 +46,6 @@ class Agua(Escena):
         self.distancia_scroll_derecha = ANCHO_PANTALLA/2
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
-        self.decorado = Decorado()
         # Creamos los sprites de los jugadores
         self.jugador = Jugador()
         self.jugador.keyUp_pulsada = False
@@ -55,6 +54,8 @@ class Agua(Escena):
         self.xmldoc = parser_escena.parse(fullname)
         self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
 
+        self.xmldoc = parser_escena.fichero_decorado(self.xmldoc)
+        self.decorado = Decorado()  
         # Creamos las plataformas
         listaPlataformas = parser_escena.listaCoordenadasPlataforma(self.xmldoc)
         self.grupoPlataformas = pygame.sprite.Group()
@@ -225,8 +226,8 @@ class Pared(MiSprite):
         self.image.fill((0,0,0))
 
 class Decorado:
-    def __init__(self):
-        self.imagen = GestorRecursos.CargarImagen('prueba.png', -1)
+    def __init__(self, filename):
+        self.imagen = GestorRecursos.CargarImagen(filename, -1)
         self.imagen = pygame.transform.scale(self.imagen, (800, 600))
 
         self.rect = self.imagen.get_rect()
