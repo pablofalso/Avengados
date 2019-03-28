@@ -22,7 +22,7 @@ MAXIMO_X = 3250
 # -------------------------------------------------
 # Clase Fase
 
-class Aire(Escena):
+class Tierra(Escena):
     def __init__(self, director, xml):
 
         # Habria que pasarle como parámetro el número de fase, a partir del cual se cargue
@@ -66,13 +66,6 @@ class Aire(Escena):
         for coordenadas in listaParedes:
             self.grupoParedes.add(Pared(coordenadas))
 
-        # Creamos las paredes
-        listaRelleno = parser_escena.listaCoordenadasRelleno(self.xmldoc)
-        self.grupoRelleno = pygame.sprite.Group()
-        for coordenadas in listaRelleno:
-            self.test = Plataforma(coordenadas)
-            self.grupoRelleno.add(Plataforma(coordenadas))
-
         # Creamos los enemigos comunes
         listaEnemigosComunes = parser_escena.listaCoordenadasPersonaje('EnemigoComun', self.xmldoc)
         self.grupoEnemigos = pygame.sprite.Group()
@@ -85,7 +78,7 @@ class Aire(Escena):
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoRelleno)
+        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes)
 
 
     def actualizarScrollHorizontal(self,jugador, tiempo):
@@ -100,7 +93,7 @@ class Aire(Escena):
     def actualizarScrollVertical(self, jugador, tiempo):
 
         if (jugador.rect.top <= ALTO_PANTALLA/2 or jugador.rect.bottom >= ALTO_PANTALLA/2):
-            self.scrolly =  self.scrolly + jugador.velocidady * tiempo
+            self.scrolly =  self.scrolly + (jugador.velocidady * tiempo)
             return True
         return False
 
@@ -145,7 +138,6 @@ class Aire(Escena):
         self.grupoSprites.draw(pantalla)
 
 
-
     def eventos(self, lista_eventos):
         # Miramos a ver si hay algun evento de salir del programa
         for evento in lista_eventos:
@@ -180,7 +172,6 @@ class Plataforma(MiSprite):
         self.image.fill((0,0,0))
 
 
-
 class Pared(MiSprite):
     def __init__(self,plataforma):
         # Primero invocamos al constructor de la clase padre
@@ -195,7 +186,7 @@ class Pared(MiSprite):
 
 class Decorado:
     def __init__(self):
-        self.imagen = GestorRecursos.CargarImagen('backgroundAire.png', -1)
+        self.imagen = GestorRecursos.CargarImagen('backgroundTierra.png', -1)
         self.imagen = pygame.transform.scale(self.imagen, (800, 600))
 
         self.rect = self.imagen.get_rect()

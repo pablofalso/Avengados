@@ -38,3 +38,14 @@ def listaCoordenadasPersonaje(tag, xmldoc):
         y = int(res[i].attributes['y'].value)
         lista.append((x,y))
     return lista
+
+def listaCoordenadasRelleno(xmldoc):
+    res = xmldoc.getElementsByTagName('relleno')
+    lista = []
+    for i in range(0,len(res)):
+        x = int(res[i].attributes['x'].value)
+        y = int(res[i].attributes['y'].value)
+        z = int(res[i].attributes['z'].value)
+        k = int(res[i].attributes['k'].value)
+        lista.append([pygame.Rect(x, y, k, z),z,k])
+    return lista

@@ -47,4 +47,14 @@
       <pared x="1800" y="-650" z="-520"/>
 
     </coordenadasParedes>
+
+
+  <coordenadasRelleno>
+
+    <relleno x="0" y="450" z="205" k="600"/>
+
+
+
+
+  </coordenadasRelleno>
 </data>

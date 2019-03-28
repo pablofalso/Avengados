@@ -8,6 +8,7 @@ from director import *
 from pruebas import Fase
 from temploAgua import Agua
 from temploAire import Aire
+from temploTierra import Tierra
 
 if __name__ == '__main__':
 
@@ -16,7 +17,7 @@ if __name__ == '__main__':
     # Creamos el director
     director = Director()
     # Creamos la escena con la pantalla inicial
-    escena = Agua(director,'agua.xml')
+    escena = Tierra(director,'tierra.xml')
     # Le decimos al director que apile esta escena
     director.apilarEscena(escena)
     # Y ejecutamos el juego
