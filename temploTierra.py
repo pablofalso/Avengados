@@ -116,7 +116,7 @@ class Tierra(Escena):
 
     def update(self,tiempo):
         if (self.jugador.movimiento == ATAQUE_DISTANCIA and self.jugador.fuego):
-            bola = BolaDeFuego(self.jugador.posicion[0], self.jugador.posicion[1]-15)
+            bola = BolaDeFuego(self.jugador, self.jugador.posicion[0], self.jugador.posicion[1]-15)
             self.jugador.fuego = False
             self.grupoSprites.add(bola)
             self.grupoSpritesDinamicos.add(bola)

@@ -372,7 +372,7 @@ class Jugador(MiSprite):
             self.numPostura = SPRITE_ATAQUE_DISTANCIA
         elif self.movimiento == ATAQUE_DISTANCIA and self.numImagenPostura == 5 and self.fuego:
                 print (self.numImagenPostura)
-                BolaDeFuego(self.posicion[0], self.posicion[1])
+                BolaDeFuego(self, self.posicion[0], self.posicion[1])
                 self.fuego = False
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
@@ -664,7 +664,7 @@ class Enemigo(MiSprite):
 
 class BolaDeFuego(MiSprite):
     "BolaDeFuego"
-    def __init__(self, posicionx, posiciony):
+    def __init__(self, jugador, posicionx, posiciony):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self)
         # Se carga la hoja
@@ -673,8 +673,14 @@ class BolaDeFuego(MiSprite):
         # El movimiento que esta realizando
         self.movimiento = ATAQUE_DISTANCIA
         # Lado hacia el que esta mirando
-        self.mirando = IZQUIERDA
-        self.velocidadx = 0.6
+        self.jugador=jugador
+        #self.mirando = IZQUIERDA
+        if self.jugador.mirando == IZQUIERDA:
+             self.velocidadx=-0.6
+             self.mirando=IZQUIERDA
+        else:
+             self.velocidadx=0.6
+             self.mirando=DERECHA
         self.scroll=(0,0)
         self.posicion = (posicionx, posiciony)
         # Leemos las coordenadas de un archivo de texto
@@ -725,13 +731,14 @@ class BolaDeFuego(MiSprite):
             # Si esta mirando a la izquiera, cogemos la porcion de la hoja
             if self.mirando == DERECHA:
                 self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+                
             #  Si no, si mira a la derecha, invertimos esa imagen
-            elif self.mirando == IZQUIERDA:
+            else:
                 self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
-
+                
 
     def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
-
+        
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
         return
