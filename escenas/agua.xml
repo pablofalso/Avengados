@@ -11,25 +11,28 @@
     </coordenadasPersonajes>
 
     <coordenadasPlataformas>
-        <plataforma x="0" y="300" z="380"/>
         <plataforma x="420" y="200" z="50"/>
         <plataforma x="620" y="250" z="50"/>
         <plataforma x="820" y="200" z="50"/>
-        <plataforma x="1050" y="300" z="855"/>
         <plataforma x="1300" y="230" z="105"/>
-        <plataforma x="375" y="350" z="675"/>
         <!---
         Aqui empiezan las coordenas de la segunda parte
         del nivel
       -->
-        <plataforma x="1900" y="500" z="900"/>
         <plataforma x="1995" y="250" z="175"/>
         <plataforma x="2270" y="300" z="50"/>
         <plataforma x="2470" y="255" z="50"/>
         <plataforma x="2670" y="255" z="50"/>
         <plataforma x="2800" y="300" z="450"/>
-        <plataforma x="3000" y="150" z="250"/>
     </coordenadasPlataformas>
+
+    <coordenadasSuelo>
+      <suelo x="0" y="300" z="380"/>
+      <suelo x="375" y="350" z="675"/>
+      <suelo x="1050" y="300" z="855"/>
+      <suelo x="1900" y="500" z="900"/>
+      <suelo x="3000" y="150" z="250"/>
+    </coordenadasSuelo>
 
     <coordenadasParedes>
         <pared x="1300" y="235" z="300"/>

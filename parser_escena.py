@@ -28,6 +28,16 @@ def listaCoordenadasPlataforma(xmldoc):
         lista.append([pygame.Rect(x, y, z-5, 5),z,5])
     return lista
 
+def listaCoordenadasSuelo(xmldoc):
+    res = xmldoc.getElementsByTagName('suelo')
+    lista = []
+    for i in range(0,len(res)):
+        x = int(res[i].attributes['x'].value)
+        y = int(res[i].attributes['y'].value)
+        z = int(res[i].attributes['z'].value)
+        lista.append([pygame.Rect(x, y, z-5, 5),z,5])
+    return lista
+
 def listaCoordenadasPared(xmldoc):
     res = xmldoc.getElementsByTagName('pared')
     lista = []

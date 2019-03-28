@@ -57,6 +57,11 @@ class Fase(Escena):
         for coordenadas in listaPlataformas:
             self.grupoPlataformas.add(Plataforma(coordenadas))
 
+        listaSuelo = parser_escena.listaCoordenadasSuelo(self.xmldoc)
+        self.grupoSuelo = pygame.sprite.Group()
+        for coordenadas in listaSuelo:
+            self.grupoPlataformas.add(Suelo(coordenadas))
+
         # Creamos las paredes
         listaParedes = parser_escena.listaCoordenadasPared(self.xmldoc)
         self.grupoParedes = pygame.sprite.Group()
@@ -75,7 +80,7 @@ class Fase(Escena):
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes)
+        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoSuelo)
         self.grupoBolasDeFuego = pygame.sprite.Group()
 
 
@@ -169,7 +174,27 @@ class Plataforma(MiSprite):
         # Y lo situamos de forma global en esas coordenadas
         self.establecerPosicion((self.rect.left, self.rect.bottom))
         # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
+        #self.image = pygame.Surface((plataforma[1], plataforma[2]))
+        #test = GestorRecursos.CargarImagen('plat.png', -1)
+        self.image = pygame.image.load(os.path.join('imagenes','plat.png')).convert()
+        self.image = pygame.transform.scale(self.image, (self.rect.width, 15))
+        self.image.convert_alpha()
+        #self.image.blit(test, self.rect)
+        #self.image.fill((0,0,0))
+
+
+class Suelo(MiSprite):
+    def __init__(self,plataforma):
+        # Primero invocamos al constructor de la clase padre
+        MiSprite.__init__(self)
+        # Rectangulo con las coordenadas en pantalla que ocupara
+        self.rect = plataforma[0]
+        # Y lo situamos de forma global en esas coordenadas
+        self.establecerPosicion((self.rect.left, self.rect.bottom))
+        # En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
         self.image = pygame.Surface((plataforma[1], plataforma[2]))
+        #test = GestorRecursos.CargarImagen('plat.png', -1)
+        #self.image.blit(test, self.rect)
         self.image.fill((0,0,0))
 
 
