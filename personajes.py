@@ -135,7 +135,7 @@ class Jugador(MiSprite):
         self.velocidadx = 0
         self.scroll=(0,0)
         # Leemos las coordenadas de un archivo de texto
-        datos = GestorRecursos.CargarArchivoCoordenadas('mikedenadas.txt')
+        datos = GestorRecursos.CargarArchivoCoordenadas('coordenadasMike.txt')
         datos = datos.split()
         self.numPostura = 1
         self.numImagenPostura = 0
@@ -304,7 +304,7 @@ class Jugador(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
         enemigo = pygame.sprite.spritecollideany(self, grupoEnemigos)
         if enemigo != None:
             if self.movimiento != ATAQUE and pygame.time.get_ticks() - self.ultimo_golpe > CD_RECIBIR_DAÑO:
@@ -385,7 +385,7 @@ class Kriss(MiSprite):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self)
         # Se carga la hoja
-        self.hoja = GestorRecursos.CargarImagen('Kriss.png',-1)
+        self.hoja = GestorRecursos.CargarImagen('KrissSprite.png',-1)
         self.hoja = self.hoja.convert_alpha()
         # El movimiento que esta realizando
         self.movimiento = KRISS_QUIETO
@@ -482,7 +482,7 @@ class Kriss(MiSprite):
         else:
             self.mirando = DERECHA
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
         if self.movimiento == KRISS_QUIETO:
             self.numPostura = SPRITE_KRISS_QUIETO
         elif self.movimiento == KRISS_MUERTO:
@@ -498,7 +498,7 @@ class Enemigo(MiSprite):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self)
         # Se carga la hoja
-        self.hoja = GestorRecursos.CargarImagen('EnemigoBasico.png',-1)
+        self.hoja = GestorRecursos.CargarImagen('EnemigoSprite.png',-1)
         self.hoja = self.hoja.convert_alpha()
         # El movimiento que esta realizando
         self.movimiento = ENEMIGO_MOVIENDOSE
@@ -620,10 +620,17 @@ class Enemigo(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes,grupoEnemigos):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
         plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
-        pared  = pygame.sprite.spritecollideany(self, grupoParedes)
+        pared = pygame.sprite.spritecollideany(self, grupoParedes)
+        bola = pygame.sprite.spritecollideany(self,grupoBolasDeFuego)
         #Primero se mira si está encima de una plataforma, si no está cae
+        if bola != None:
+            self.numPostura = SPRITE_ENEMIGO_MUERTO
+            self.movimiento = ENEMIGO_MUERTO
+            self.numImagenPostura = 0
+            self.retardoMovimiento = 0
+            self.velocidadx = 0
         if plataforma == None:
             self.numPostura = SPRITE_ENEMIGO_CAYENDO
             self.movimiento = ENEMIGO_CAYENDO
@@ -686,7 +693,7 @@ class BolaDeFuego(MiSprite):
         self.scroll=(0,0)
         self.posicion = (posicionx, posiciony)
         # Leemos las coordenadas de un archivo de texto
-        datos = GestorRecursos.CargarArchivoCoordenadas('mikedenadas.txt')
+        datos = GestorRecursos.CargarArchivoCoordenadas('coordenadasMike.txt')
         datos = datos.split()
         self.numPostura = ATAQUE_DISTANCIA
         self.numImagenPostura = 0
@@ -739,7 +746,7 @@ class BolaDeFuego(MiSprite):
                 self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
                 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
         
         self.actualizarPostura()
         MiSprite.update(self,tiempo)

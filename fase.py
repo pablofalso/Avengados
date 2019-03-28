@@ -22,7 +22,7 @@ ATAQUE_DISTANCIA = 7
 # -------------------------------------------------
 # Clase Fase
 
-class Tierra(Escena):
+class Fase(Escena):
     def __init__(self, director, xml):
 
         # Habria que pasarle como parámetro el número de fase, a partir del cual se cargue
@@ -113,7 +113,7 @@ class Tierra(Escena):
     def update(self,tiempo):
         if (self.jugador.movimiento == ATAQUE_DISTANCIA and self.jugador.fuego):
             bola = BolaDeFuego(self.jugador, self.jugador.posicion[0], self.jugador.posicion[1]-15)
-            self.grupoBolasDeFuegod.add(bola)
+            self.grupoBolasDeFuego.add(bola)
             self.jugador.fuego = False
             self.grupoSprites.add(bola)
             self.grupoSpritesDinamicos.add(bola)
