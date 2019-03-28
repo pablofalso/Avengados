@@ -282,7 +282,6 @@ class Jugador(MiSprite):
                 self.movimiento = ARRIBA
                 self.keyUp_suelta = False
         elif teclasPulsadas[arriba]:
-            print("salta a la derecha")
             self.keyUp_pulsada = True
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
@@ -674,13 +673,16 @@ class BolaDeFuego(MiSprite):
         self.movimiento = ATAQUE_DISTANCIA
         # Lado hacia el que esta mirando
         self.jugador=jugador
-        #self.mirando = IZQUIERDA
+        pygame.time.Clock()
+        self.clock =pygame.time.get_ticks() 
+
         if self.jugador.mirando == IZQUIERDA:
              self.velocidadx=-0.6
              self.mirando=IZQUIERDA
         else:
              self.velocidadx=0.6
              self.mirando=DERECHA
+
         self.scroll=(0,0)
         self.posicion = (posicionx, posiciony)
         # Leemos las coordenadas de un archivo de texto
@@ -741,4 +743,7 @@ class BolaDeFuego(MiSprite):
         
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
+        
+        if pygame.time.get_ticks() - self.clock >= 800:
+                self.kill()
         return

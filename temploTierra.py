@@ -5,7 +5,6 @@ from escena import *
 from personajes import *
 from pygame.locals import *
 import parser_escena
-from personajes import BolaDeFuego
 # -------------------------------------------------
 # -------------------------------------------------
 # Constantes
