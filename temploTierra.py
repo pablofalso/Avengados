@@ -5,7 +5,7 @@ from escena import *
 from personajes import *
 from pygame.locals import *
 import parser_escena
-
+from personajes import BolaDeFuego
 # -------------------------------------------------
 # -------------------------------------------------
 # Constantes
@@ -19,6 +19,7 @@ MINIMO_Y_JUGADOR = 100
 MAXIMO_Y_JUGADOR = ALTO_PANTALLA - MINIMO_Y_JUGADOR
 MAXIMO_Y = -1000
 MAXIMO_X = 3250
+ATAQUE_DISTANCIA = 7
 # -------------------------------------------------
 # Clase Fase
 
@@ -114,6 +115,11 @@ class Tierra(Escena):
 
 
     def update(self,tiempo):
+        if (self.jugador.movimiento == ATAQUE_DISTANCIA and self.jugador.fuego):
+            bola = BolaDeFuego(self.jugador.posicion[0], self.jugador.posicion[1]-15)
+            self.jugador.fuego = False
+            self.grupoSprites.add(bola)
+            self.grupoSpritesDinamicos.add(bola)
         # Actualizamos los Sprites dinamicos
         # De esta forma, se simula que cambian todos a la vez
         # Esta operación de update ya comprueba que los movimientos sean correctos

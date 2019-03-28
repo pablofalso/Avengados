@@ -162,6 +162,7 @@ class Jugador(MiSprite):
         self.dobleSalto_segundoSalto = False
         # Variable para controlar si se suelta la tecla de salto después de saltar por primera vez
         self.keyUp_suelta = False
+        self.fuego  = False
 
         self.dash_desbloqueado = True
         # Variable para controlar el tiempo desde que se utilizó el último dash
@@ -182,7 +183,6 @@ class Jugador(MiSprite):
         self.actualizarPostura()
 
     def actualizarPostura(self):
-        print("postura")
         self.retardoMovimiento -= 1
         # Miramos si ha pasado el retardo para dibujar una nueva postura
         if (self.retardoMovimiento < 0):
@@ -207,7 +207,7 @@ class Jugador(MiSprite):
             if self.numImagenPostura < 0:
                 self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
             self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
-            
+
             self.rect.height = self.coordenadasHoja[self.numPostura][self.numImagenPostura][3] + 5
             self.rect.width = self.coordenadasHoja[self.numPostura][self.numImagenPostura][2]
             # Si esta mirando a la izquiera, cogemos la porcion de la hoja
@@ -233,7 +233,6 @@ class Jugador(MiSprite):
             if (self.numImagenPostura == 4):
                 self.movimiento = QUIETO
                 self.atacando_distancia = False
-                BolaDeFuego(self.posicion[0], self.posicion[1])
         # Primero comprobamos la tecla del ataque_melee para poder atacar cuando vas corriendo
         # Así puedes atacar sin soltar las teclas de movimiento
         elif teclasPulsadas[ataque_melee]:
@@ -254,6 +253,7 @@ class Jugador(MiSprite):
             self.movimiento = ATAQUE_DISTANCIA
             self.atacando_distancia = True
             self.numImagenPostura = 0
+            self.fuego = True
         elif teclasPulsadas[arriba] and teclasPulsadas[izquierda]:
             # Si estamos en el aire y han pulsado arriba
             if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
@@ -370,7 +370,10 @@ class Jugador(MiSprite):
         if self.movimiento == ATAQUE_DISTANCIA:
             self.velocidadx = 0
             self.numPostura = SPRITE_ATAQUE_DISTANCIA
-
+        elif self.movimiento == ATAQUE_DISTANCIA and self.numImagenPostura == 5 and self.fuego:
+                print (self.numImagenPostura)
+                BolaDeFuego(self.posicion[0], self.posicion[1])
+                self.fuego = False
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
         return
@@ -419,7 +422,7 @@ class Kriss(MiSprite):
 
         # La posicion inicial del Sprite
         self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
-        
+
         # Y actualizamos la postura del Sprite inicial, llamando al metodo correspondiente
         self.actualizarPostura()
 
@@ -650,7 +653,7 @@ class Enemigo(MiSprite):
             if not (self.numPostura == SPRITE_ENEMIGO_CAYENDO):
                 self.numPostura = SPRITE_ENEMIGO_ATACANDO
                 self.velocidadx = 0
-        
+
         if self.numPostura == SPRITE_ENEMIGO_CAYENDO:
             self.velocidady += GRAVEDAD
 
@@ -658,8 +661,77 @@ class Enemigo(MiSprite):
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
         return
-        
-class BolaDeFuego(pygame.sprite.Sprite):
+
+class BolaDeFuego(MiSprite):
     "BolaDeFuego"
     def __init__(self, posicionx, posiciony):
-        print("fireball")
+        # Primero invocamos al constructor de la clase padre
+        pygame.sprite.Sprite.__init__(self)
+        # Se carga la hoja
+        self.hoja = GestorRecursos.CargarImagen('MikeSprite.png',-1)
+        self.hoja = self.hoja.convert_alpha()
+        # El movimiento que esta realizando
+        self.movimiento = ATAQUE_DISTANCIA
+        # Lado hacia el que esta mirando
+        self.mirando = IZQUIERDA
+        self.velocidadx = 0.6
+        self.scroll=(0,0)
+        self.posicion = (posicionx, posiciony)
+        # Leemos las coordenadas de un archivo de texto
+        datos = GestorRecursos.CargarArchivoCoordenadas('mikedenadas.txt')
+        datos = datos.split()
+        self.numPostura = ATAQUE_DISTANCIA
+        self.numImagenPostura = 0
+        cont = 0
+        numImagenes = [6,11,2,2,6,1,5,1]
+        self.coordenadasHoja = []
+        #for linea in range(0, n): para n movimientos
+        for linea in range(0, 8):
+            self.coordenadasHoja.append([])
+            tmp = self.coordenadasHoja[linea]
+            for postura in range(1, numImagenes[linea]+1):
+                tmp.append(pygame.Rect((int(datos[cont]), int(datos[cont+1])), (int(datos[cont+2]), int(datos[cont+3]))))
+                cont += 4
+
+        # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
+        self.retardoMovimiento = 0
+
+        # La posicion inicial del Sprite
+        self.rect = pygame.Rect(posicionx, posiciony,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
+
+        # La posicion x e y que ocupa
+
+        # Velocidad en el eje y (para los saltos)
+        #  En el eje x se utilizaria si hubiese algun tipo de inercia
+        self.velocidady = 0
+
+        # Y actualizamos la postura del Sprite inicial, llamando al metodo correspondiente
+        self.actualizarPostura()
+
+    def actualizarPostura(self):
+        self.retardoMovimiento -= 1
+        # Miramos si ha pasado el retardo para dibujar una nueva postura
+        if (self.retardoMovimiento < 0):
+
+            self.numImagenPostura += 1
+            if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
+                self.numImagenPostura = 0
+            if self.numImagenPostura < 0:
+                self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
+            self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+
+            self.rect.height = self.coordenadasHoja[self.numPostura][self.numImagenPostura][3] + 5
+            self.rect.width = self.coordenadasHoja[self.numPostura][self.numImagenPostura][2]
+            # Si esta mirando a la izquiera, cogemos la porcion de la hoja
+            if self.mirando == DERECHA:
+                self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+            #  Si no, si mira a la derecha, invertimos esa imagen
+            elif self.mirando == IZQUIERDA:
+                self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+
+
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos):
+
+        self.actualizarPostura()
+        MiSprite.update(self,tiempo)
+        return
