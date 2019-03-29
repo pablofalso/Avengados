@@ -6,6 +6,9 @@
 
     <coordenadasPersonajes>
         <Mike x="0" y="450"/>
+        <EnemigoComun x="1130" y="205"/>
+        <EnemigoComun x="1170" y="-270"/>
+        <EnemigoComun x="1675" y="-645"/>
     </coordenadasPersonajes>
 
     <coordenadasPlataformas>
@@ -70,4 +73,8 @@
 
 
   </coordenadasRelleno>
+  <coordenadasUpgradeVida>
+      <vida x="1544" y="205" />
+      <vida x="40" y="-5"/>
+    </coordenadasUpgradeVida>
 </data>

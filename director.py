@@ -42,7 +42,7 @@ class Director():
             escena.eventos(pygame.event.get())
 
             # Actualiza la escena
-            escena.update(tiempo_pasado)
+            escena.update(tiempo_pasado, self.screen)
 
             # Se dibuja en pantalla
             escena.dibujar(self.screen)

@@ -319,7 +319,6 @@ class Jugador(MiSprite):
 
 
     def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
-        print(self.hp_max)
         if self.movimiento == MUERTO:
             self.actualizarPostura()
             MiSprite.update(self,tiempo)
@@ -337,7 +336,7 @@ class Jugador(MiSprite):
             if self.movimiento != ATAQUE and pygame.time.get_ticks() - self.ultimo_golpe > CD_RECIBIR_DAÑO:
                 if enemigo.movimiento == ENEMIGO_ATACANDO:
                     self.ultimo_golpe = pygame.time.get_ticks()
-                    if self.hp == 1:
+                    if self.hp <= 0:
                         self.numPostura = SPRITE_MUERTO
                         self.movimiento = MUERTO
                         self.numImagenPostura = 0
@@ -348,8 +347,8 @@ class Jugador(MiSprite):
                         return
                     else:
                         self.hp -= 1
-        if self.posicion[0] <= 0:
-            self.establecerPosicion((2, self.posicion[1]))
+            if (self.movimiento == ATAQUE):
+                enemigo.hp -= self.dano_max
         if self.posicion[0] > 3200:
             self.establecerPosicion((3200, self.posicion[1]))
         plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
@@ -405,13 +404,13 @@ class Jugador(MiSprite):
             self.velocidadx = 0
             self.numPostura = SPRITE_ATAQUE_DISTANCIA
         elif self.movimiento == ATAQUE_DISTANCIA and self.numImagenPostura == 5 and self.fuego:
-                print (self.numImagenPostura)
                 BolaDeFuego(self, self.posicion[0], self.posicion[1])
                 self.fuego = False
         vida = pygame.sprite.spritecollideany(self, grupoUpgradeVida)
         dano = pygame.sprite.spritecollideany(self, grupoUpgradedeDano)
         if vida != None:
             self.hp_max +=1
+            self.hp = self.hp_max
             vida.kill()
         if dano != None:
             self.dano_max +=1
@@ -552,6 +551,7 @@ class Enemigo(MiSprite):
         self.empezar_andar = 0
         self.velocidadx = 0
         self.scroll=(0,0)
+        self.hp = 25
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('coordenadasEnemigoBasico.txt')
         datos = datos.split()
@@ -626,7 +626,7 @@ class Enemigo(MiSprite):
                     matar = True
                 elif (self.posicion[0] < jugador.posicion[0] and jugador.mirando ==  IZQUIERDA):
                     matar = True
-                if matar and jugador.movimiento == ATAQUE:
+                if self.hp <= 0 and jugador.movimiento == ATAQUE:
                         self.numPostura = SPRITE_ENEMIGO_MUERTO
                         self.movimiento = ENEMIGO_MUERTO
                         self.numImagenPostura = 0
@@ -669,11 +669,13 @@ class Enemigo(MiSprite):
         bola = pygame.sprite.spritecollideany(self,grupoBolasDeFuego)
         #Primero se mira si está encima de una plataforma, si no está cae
         if bola != None:
-            self.numPostura = SPRITE_ENEMIGO_MUERTO
-            self.movimiento = ENEMIGO_MUERTO
-            self.numImagenPostura = 0
-            self.retardoMovimiento = 0
-            self.velocidadx = 0
+            self.hp -=2
+            if (self.hp <= 0):
+                self.numPostura = SPRITE_ENEMIGO_MUERTO
+                self.movimiento = ENEMIGO_MUERTO
+                self.numImagenPostura = 0
+                self.retardoMovimiento = 0
+                self.velocidadx = 0
         if plataforma == None:
             self.numPostura = SPRITE_ENEMIGO_CAYENDO
             self.movimiento = ENEMIGO_CAYENDO
@@ -767,6 +769,10 @@ class BolaDeFuego(MiSprite):
 
         if pygame.time.get_ticks() - self.clock >= 800:
                 self.kill()
+
+        pared = pygame.sprite.spritecollideany(self, grupoParedes)
+        if (pared != None):
+            self.kill()
         return
 
 
@@ -787,7 +793,6 @@ class UpgradeVida(MiSprite):
         self.scroll=(0,0)
         self.mirando = DERECHA
         self.posicion = coordenadas
-        print (self.posicion)
         self.coordenadasHoja = [132, 3398, 32, 32]
         # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
         self.retardoMovimiento = 0
