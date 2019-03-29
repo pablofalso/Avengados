@@ -55,7 +55,7 @@ class Agua(Escena):
         self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
 
         self.xmldoc = parser_escena.fichero_decorado(self.xmldoc)
-        self.decorado = Decorado()  
+        self.decorado = Decorado()
         # Creamos las plataformas
         listaPlataformas = parser_escena.listaCoordenadasPlataforma(self.xmldoc)
         self.grupoPlataformas = pygame.sprite.Group()

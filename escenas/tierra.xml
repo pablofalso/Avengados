@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data>
     <decorado name="backgroundTierra.png"/>
-
+    <texturas name="texturaTierra.png"/>
     <limitesMapa x="2000" y="1500"/>
     <coordenadasPersonajes>
         <Mike x="0" y="100"/>
@@ -9,14 +9,14 @@
     </coordenadasPersonajes>
 
     <coordenadasPlataformas>
-        <plataforma x="0" y="100" z="355"/>
+
         <plataforma x="500" y="250" z="150"/>
         <plataforma x="750" y="300" z="150"/>
         <plataforma x="500" y="550" z="150"/>
         <plataforma x="500" y="400" z="150"/>
         <plataforma x="350" y="150" z="150"/>
         <plataforma x="755" y="500" z="150"/>
-        <plataforma x="355" y="600" z="805"/>
+
 
 
 
@@ -46,4 +46,41 @@
 
 
     </coordenadasParedes>
+
+
+    <coordenadasSuelo>
+      <suelo x="0" y="100" z="355"/>
+      <suelo x="355" y="600" z="805"/>
+    </coordenadasSuelo>
+
+
+  <coordenadasRelleno>
+
+    <relleno x="0" y="100" z="355" k="355"/>
+    <relleno x="0" y="455" z="355" k="355"/>
+    <relleno x="0" y="810" z="355" k="355"/>
+
+
+    <relleno x="355" y="600" z="355" k="355"/>
+    <relleno x="710" y="600" z="450" k="355"/>
+
+    <relleno x="355" y="955" z="355" k="355"/>
+    <relleno x="710" y="955" z="450" k="355"/>
+
+    <relleno x="355" y="1300" z="355" k="355"/>
+    <relleno x="710" y="1300" z="450" k="355"/>
+
+    <relleno x="355" y="1300" z="355" k="355"/>
+    <relleno x="710" y="1300" z="450" k="355"/>
+
+
+    <relleno x="1150" y="1000" z="505" k="355"/>
+    <relleno x="1150" y="1355" z="505" k="355"/>
+
+    <relleno x="1955" y="1000" z="300" k="355"/>
+    <relleno x="1955" y="1355" z="300" k="355"/>
+
+
+
+  </coordenadasRelleno>
 </data>

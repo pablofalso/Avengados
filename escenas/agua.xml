@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data>
-    <decorado name="backgroundAire.png"/> 
-    
+    <decorado name="backgroundAire.png"/>
+    <texturas name="texturaAgua.png"/>
+
+
     <limitesMapa x="3500" y="750"/>
-    
+
     <coordenadasPersonajes>
         <Mike x="0" y="300"/>
         <Kriss x="100" y="300"/>
@@ -14,7 +16,7 @@
         <plataforma x="420" y="200" z="50"/>
         <plataforma x="620" y="250" z="50"/>
         <plataforma x="820" y="200" z="50"/>
-        <plataforma x="1300" y="230" z="105"/>
+
         <!---
         Aqui empiezan las coordenas de la segunda parte
         del nivel
@@ -23,7 +25,8 @@
         <plataforma x="2270" y="300" z="50"/>
         <plataforma x="2470" y="255" z="50"/>
         <plataforma x="2670" y="255" z="50"/>
-        <plataforma x="2800" y="300" z="450"/>
+
+        <plataforma x="3000" y="150" z="250"/>
     </coordenadasPlataformas>
 
     <coordenadasSuelo>
@@ -31,7 +34,9 @@
       <suelo x="375" y="350" z="675"/>
       <suelo x="1050" y="300" z="855"/>
       <suelo x="1900" y="500" z="900"/>
-      <suelo x="3000" y="150" z="250"/>
+      <suelo x="2800" y="300" z="450"/>
+      <suelo x="1300" y="230" z="105"/>
+
     </coordenadasSuelo>
 
     <coordenadasParedes>
@@ -47,4 +52,22 @@
         <pared x="1900" y="305" z="500"/>
         <pared x="2800" y="305" z="500"/>
     </coordenadasParedes>
+
+    <coordenadasRelleno>
+      <relleno x="0" y="300" z="380" k="370"/>
+      <relleno x="375" y="350" z="675" k="500"/>
+      <relleno x="1050" y="300" z="855" k="500"/>
+      <relleno x="1900" y="500" z="900" k="500"/>
+      <relleno x="2800" y="300" z="450" k="500"/>
+      <relleno x="1300" y="230" z="105" k="75"/>
+
+
+    </coordenadasRelleno>
+
+
+
+
+
+
+
 </data>
