@@ -6,7 +6,7 @@ from personajes import *
 from pygame.locals import *
 import parser_escena
 
-class Titulo(Escena):
+class Menu(Escena):
     def __init__(self, director):
         Escena.__init__(self, director)
         self.decorado = Decorado()
@@ -19,16 +19,17 @@ class Titulo(Escena):
 
     def eventos(self, lista_eventos):
         # Miramos a ver si hay algun evento de salir del programa
-        NuevaPartida = pygame.Rect(159,265, 383, 38)
-        Continuar = pygame.Rect(159,352, 383, 38)
-        SalirDelJuego = pygame.Rect(159,440, 383, 38)
+        Agua = pygame.Rect(299,127, 218, 56)
+        Aire = pygame.Rect(299,223, 218, 56)
+        Tierra = pygame.Rect(299,311, 218, 56)
+        Woods = pygame.Rect(299,407,218, 56)
         for evento in lista_eventos:
             # Si se quiere salir, se le indica al director
             if evento.type == pygame.QUIT:
                 self.director.salirPrograma()
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = evento.pos
-                if NuevaPartida.collidepoint(mouse_pos) or Continuar.collidepoint(mouse_pos) or SalirDelJuego.collidepoint(mouse_pos):
+                if Agua.collidepoint(mouse_pos) or Aire.collidepoint(mouse_pos)or Tierra.collidepoint(mouse_pos) or Woods.collidepoint(mouse_pos):
                     # prints current location of mouse
                     print('button was pressed at {0}'.format(mouse_pos))
 
@@ -45,7 +46,7 @@ class Titulo(Escena):
 
 class Decorado:
     def __init__(self):
-        self.imagen = GestorRecursos.CargarImagen('titulo.png', -1)
+        self.imagen = GestorRecursos.CargarImagen('menu.png', -1)
         self.imagen = pygame.transform.scale(self.imagen, (800, 600))
 
         self.rect = self.imagen.get_rect()
