@@ -51,6 +51,7 @@ class Fase(Escena):
 
         # Creamos los sprites de los jugadores
         self.jugador = Jugador(self.limite_inferior)
+        self.vida_act = self.jugador.hp
         self.jugador.keyUp_pulsada = False
         self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
 
@@ -94,6 +95,8 @@ class Fase(Escena):
         for coordenadas in listaUpgradesDano:
             self.grupoUpgradeDano.add(UpgradedeDano(coordenadas))
 
+        self.corazon_vida = UpgradeVida((30,10))
+
 
 
         # Creamos un grupo con los Sprites que se mueven
@@ -102,13 +105,14 @@ class Fase(Escena):
         # Creamos otro grupo con todos los Sprites
         self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoSuelo, self.grupoUpgradeVida, self.grupoUpgradeDano)
         self.grupoBolasDeFuego = pygame.sprite.Group()
+        self.grupoBarraVida = pygame.sprite.Group(self.corazon_vida)
 
 
     def actualizarScrollHorizontal(self,jugador, tiempo):
-       if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2 and jugador.posicion[0] <= 3200 - ANCHO_PANTALLA/2):
+       if (jugador.mirando == DERECHA and jugador.rect.right >= ANCHO_PANTALLA/2 and jugador.posicion[0] <= self.limitex - ANCHO_PANTALLA/2):
            self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
            return True
-       if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and self.scrollx >=0 and jugador.posicion[0] >= ANCHO_PANTALLA/2):
+       if (jugador.mirando == IZQUIERDA and jugador.rect.left <= ANCHO_PANTALLA/2 and self.scrollx > 0 and jugador.posicion[0] + 100 > ANCHO_PANTALLA/2):
            self.scrollx =  self.scrollx + jugador.velocidadx * tiempo
            return True
        return False
@@ -136,7 +140,7 @@ class Fase(Escena):
             # Ademas, actualizamos el decorado para que se muestre una parte distinta
             #self.decorado.update(self.scrollx)
 
-    def update(self,tiempo):
+    def update(self,tiempo, pantalla):
         if (self.jugador.movimiento == ATAQUE_DISTANCIA and self.jugador.fuego):
             bola = BolaDeFuego(self.jugador, self.jugador.posicion[0], self.jugador.posicion[1]-15)
             self.grupoBolasDeFuego.add(bola)
@@ -157,7 +161,11 @@ class Fase(Escena):
         self.actualizarScroll(self.jugador, tiempo)
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)
-
+        if (self.jugador.hp < self.vida_act):
+            vida_act = self.jugador.hp
+            font=pygame.font.Font(None,30)
+            vida=font.render(str(self.jugador.hp) , 1,(255,0,0))
+            pantalla.blit(vida, (10, 10))
 
     def dibujar(self, pantalla):
         pantalla.fill((133,133,133))
@@ -167,6 +175,10 @@ class Fase(Escena):
         self.decorado.dibujar(pantalla)
         # Luego los Sprites
         self.grupoSprites.draw(pantalla)
+        self.grupoBarraVida.draw(pantalla)
+        font=pygame.font.Font(None,30)
+        scoretext=font.render(str(self.jugador.hp) , 1,(255,0,0))
+        pantalla.blit(scoretext, (10, 10))
 
 
     def eventos(self, lista_eventos):

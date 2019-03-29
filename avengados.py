@@ -8,7 +8,7 @@ from director import Director
 from fase import Fase
 
 if __name__ == '__main__':
-
+    pygame.font.init()
     # Inicializamos la libreria de pygame
     pygame.init()
     # Creamos el director
