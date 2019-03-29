@@ -38,7 +38,7 @@ class Fase(Escena):
         #  En ese caso solo hay scroll horizontal
         #  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
 
-
+        self.xml = xml
         fullname = os.path.join('escenas', xml)
         self.xmldoc = parser_escena.parse(fullname)
         self.textura = parser_escena.texturas(self.xmldoc)
@@ -141,6 +141,9 @@ class Fase(Escena):
             #self.decorado.update(self.scrollx)
 
     def update(self,tiempo, pantalla):
+        if (self.jugador.posicion[0] <= -50):
+            escena = Fase(self.director,'aire.xml')
+            self.director.apilarEscena(escena)
         if (self.jugador.movimiento == ATAQUE_DISTANCIA and self.jugador.fuego):
             bola = BolaDeFuego(self.jugador, self.jugador.posicion[0], self.jugador.posicion[1]-15)
             self.grupoBolasDeFuego.add(bola)
@@ -152,8 +155,10 @@ class Fase(Escena):
         # Esta operación de update ya comprueba que los movimientos sean correctos
         #  y, si lo son, realiza el movimiento de los Sprites
         if self.jugador.hp <= 0:
-            pygame.time.wait(500)
-            self.director.salirPrograma()
+            pantalla.fill((0,0,0))
+            pygame.time.wait(100)
+            escena = Fase(self.director,self.xml)
+            self.director.apilarEscena(escena)
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)
         self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos, self.grupoBolasDeFuego,

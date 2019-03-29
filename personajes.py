@@ -349,8 +349,6 @@ class Jugador(MiSprite):
                         self.hp -= 1
             if (self.movimiento == ATAQUE):
                 enemigo.hp -= self.dano_max
-        if self.posicion[0] <= 0:
-            self.establecerPosicion((2, self.posicion[1]))
         if self.posicion[0] > 3200:
             self.establecerPosicion((3200, self.posicion[1]))
         plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)

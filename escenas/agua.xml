@@ -31,7 +31,7 @@
     </coordenadasPlataformas>
 
     <coordenadasSuelo>
-      <suelo x="0" y="300" z="380"/>
+      <suelo x="-100" y="300" z="380"/>
       <suelo x="375" y="350" z="675"/>
       <suelo x="1050" y="300" z="855"/>
       <suelo x="1900" y="500" z="900"/>
