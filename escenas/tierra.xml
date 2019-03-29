@@ -79,7 +79,12 @@
 
     <relleno x="1355" y="505" z="300" k="300"/>
 
-
-
   </coordenadasRelleno>
+
+
+
+  <coordenadasUpgradeVida>
+    <vida x="0" y="200" />
+    <vida x="355" y="600"/>
+  </coordenadasUpgradeVida>
 </data>

@@ -139,6 +139,9 @@ class Jugador(MiSprite):
         self.dasheando = False
         self.velocidadx = 0
         self.scroll=(0,0)
+
+        self.hp_max = HP
+        self.dano_max = 1
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('coordenadasMike.txt')
         datos = datos.split()
@@ -315,7 +318,8 @@ class Jugador(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
+        print(self.hp_max)
         if self.movimiento == MUERTO:
             self.actualizarPostura()
             MiSprite.update(self,tiempo)
@@ -404,6 +408,14 @@ class Jugador(MiSprite):
                 print (self.numImagenPostura)
                 BolaDeFuego(self, self.posicion[0], self.posicion[1])
                 self.fuego = False
+        vida = pygame.sprite.spritecollideany(self, grupoUpgradeVida)
+        dano = pygame.sprite.spritecollideany(self, grupoUpgradedeDano)
+        if vida != None:
+            self.hp_max +=1
+            vida.kill()
+        if dano != None:
+            self.dano_max +=1
+            dano.kill()
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
         return
@@ -513,7 +525,7 @@ class Kriss(MiSprite):
         else:
             self.mirando = DERECHA
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
         if self.movimiento == KRISS_QUIETO:
             self.numPostura = SPRITE_KRISS_QUIETO
         elif self.movimiento == KRISS_MUERTO:
@@ -651,7 +663,7 @@ class Enemigo(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
         plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
         pared = pygame.sprite.spritecollideany(self, grupoParedes)
         bola = pygame.sprite.spritecollideany(self,grupoBolasDeFuego)
@@ -748,7 +760,7 @@ class BolaDeFuego(MiSprite):
             self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
 
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
@@ -760,7 +772,7 @@ class BolaDeFuego(MiSprite):
 
 class UpgradeVida(MiSprite):
     "UpgradeVida"
-    def __init__(self, posicionx, posiciony):
+    def __init__(self, coordenadas):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self)
         # Se carga la hoja
@@ -774,13 +786,14 @@ class UpgradeVida(MiSprite):
         self.velocidadx = 0
         self.scroll=(0,0)
         self.mirando = DERECHA
-        self.posicion = (posicionx, posiciony)
+        self.posicion = coordenadas
+        print (self.posicion)
         self.coordenadasHoja = [132, 3398, 32, 32]
         # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
         self.retardoMovimiento = 0
 
         # La posicion inicial del Sprite
-        self.rect = pygame.Rect(posicionx, posiciony,self.coordenadasHoja[2],self.coordenadasHoja[3])
+        self.rect = pygame.Rect(self.posicion[0], self.posicion[1],self.coordenadasHoja[2],self.coordenadasHoja[3])
 
         # La posicion x e y que ocupa
 
@@ -800,7 +813,7 @@ class UpgradeVida(MiSprite):
         else:
             self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
 
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
@@ -852,7 +865,7 @@ class UpgradeDano(MiSprite):
             self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
 
         self.actualizarPostura()
         MiSprite.update(self,tiempo)

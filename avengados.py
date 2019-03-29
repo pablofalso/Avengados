@@ -5,9 +5,6 @@
 import pygame
 import director
 from director import Director
-from temploAgua import Agua
-from temploAire import Aire
-from temploTierra import Tierra
 from fase import Fase
 
 if __name__ == '__main__':
@@ -17,7 +14,7 @@ if __name__ == '__main__':
     # Creamos el director
     director = Director()
     # Creamos la escena con la pantalla inicial
-    escena = Fase(director,'tierra.xml')
+    escena = Fase(director,'agua.xml')
     # Le decimos al director que apile esta escena
     director.apilarEscena(escena)
     # Y ejecutamos el juego

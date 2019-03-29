@@ -64,8 +64,10 @@
 
     </coordenadasRelleno>
 
-
-
+    <coordenadasUpgradeVida>
+      <vida x="0" y="200" />
+      <vida x="355" y="600"/>
+    </coordenadasUpgradeVida>
 
 
 

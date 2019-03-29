@@ -71,3 +71,12 @@ def listaCoordenadasRelleno(xmldoc):
         k = int(res[i].attributes['k'].value)
         lista.append([pygame.Rect(x, y, k, z),z,k])
     return lista
+
+def coordenadasUpgrades(tag, xmldoc):
+    res =  xmldoc.getElementsByTagName(tag)
+    lista = []
+    for i in range(0,len(res)):
+        x = int(res[i].attributes['x'].value)
+        y = int(res[i].attributes['y'].value)
+        lista.append((x,y))
+    return lista

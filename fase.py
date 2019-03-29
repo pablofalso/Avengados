@@ -48,9 +48,7 @@ class Fase(Escena):
         self.fondo = parser_escena.decorado(self.xmldoc)
         self.decorado = Decorado(self.fondo)
 
-        self.test1 = UpgradeVida(50, 100)
-        self.test2 =  UpgradeDano(100, 100)
-        self.grupoUpgrade = pygame.sprite.Group(self.test1, self.test2)
+
         # Creamos los sprites de los jugadores
         self.jugador = Jugador(self.limite_inferior)
         self.jugador.keyUp_pulsada = False
@@ -86,11 +84,23 @@ class Fase(Escena):
             enemigo.establecerPosicion(coordenadas)
             self.grupoEnemigos.add(enemigo)
 
+        listaUpgradesVida = parser_escena.coordenadasUpgrades('vida', self.xmldoc)
+        self.grupoUpgradeVida = pygame.sprite.Group()
+        for coordenadas in listaUpgradesVida:
+            self.grupoUpgradeVida.add(UpgradeVida(coordenadas))
+
+        listaUpgradesDano = parser_escena.coordenadasUpgrades('daño', self.xmldoc)
+        self.grupoUpgradeDano = pygame.sprite.Group()
+        for coordenadas in listaUpgradesDano:
+            self.grupoUpgradeDano.add(UpgradedeDano(coordenadas))
+
+
+
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoSuelo, self.grupoUpgrade)
+        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoSuelo, self.grupoUpgradeVida, self.grupoUpgradeDano)
         self.grupoBolasDeFuego = pygame.sprite.Group()
 
 
@@ -142,7 +152,8 @@ class Fase(Escena):
             self.director.salirPrograma()
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)
-        self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos, self.grupoBolasDeFuego)
+        self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos, self.grupoBolasDeFuego,
+        self.grupoUpgradeVida, self.grupoUpgradeDano)
         self.actualizarScroll(self.jugador, tiempo)
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)
