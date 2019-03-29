@@ -100,9 +100,9 @@ class Fase(Escena):
         self.jefe.establecerPosicion(parser_escena.coordenadasPersonaje('Jefe',self.xmldoc))
         self.grupoEnemigos.add(self.jefe)
 
-        self.kriss = Kriss()
-        self.kriss.establecerPosicion(parser_escena.coordenadasPersonaje('Kriss',self.xmldoc))
-        self.grupoEnemigos.add(self.kriss)
+        #self.kriss = Kriss()
+        #self.kriss.establecerPosicion(parser_escena.coordenadasPersonaje('Kriss',self.xmldoc))
+        #self.grupoEnemigos.add(self.kriss)
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos, self.jefe)

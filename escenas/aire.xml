@@ -8,7 +8,7 @@
         <Mike x="0" y="450"/>
         <EnemigoComun x="1130" y="205"/>
         <EnemigoComun x="1170" y="-270"/>
-        <Jefe x="1675" y="-645" escala="1"/>
+        <Jefe x="1675" y="-645" escala="2"/>
     </coordenadasPersonajes>
 
     <coordenadasPlataformas>

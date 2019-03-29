@@ -615,7 +615,7 @@ class Jefe(MiSprite):
         self.empezar_andar = 0
         self.velocidadx = 0
         self.scroll=(0,0)
-        self.hp = 50
+        self.hp = 100*escala
         self.daño = escala
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('coordenadasEnemigoBasico.txt')
@@ -797,7 +797,7 @@ class Kriss(MiSprite):
         self.empezar_andar = 0
         self.velocidadx = 0
         self.scroll=(0,0)
-        self.hp = 50
+        self.hp = 200
         self.daño = 5
         # Leemos las coordenadas de un archivo de texto
         datos = GestorRecursos.CargarArchivoCoordenadas('coordenadasKriss.txt')
