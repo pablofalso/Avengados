@@ -34,7 +34,6 @@ class Titulo(Escena):
 
     def on_close(self):
         self.director.salirPrograma()
-
     # El evento relativo al clic del raton
     def on_mouse_press(self, x, y, button):
         # Si se pulsa el boton izquierdo
