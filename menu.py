@@ -5,6 +5,7 @@ from escena import *
 from personajes import *
 from pygame.locals import *
 import parser_escena
+import fase
 
 class Menu(Escena):
     def __init__(self, director):
@@ -29,7 +30,16 @@ class Menu(Escena):
                 self.director.salirPrograma()
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = evento.pos
-                if Agua.collidepoint(mouse_pos) or Aire.collidepoint(mouse_pos)or Tierra.collidepoint(mouse_pos) or Woods.collidepoint(mouse_pos):
+                if Agua.collidepoint(mouse_pos):
+                    escena = escena = fase.Fase(self.director,'agua.xml')
+                    self.director.apilarEscena(escena)
+                elif Aire.collidepoint(mouse_pos) :
+                    escena = escena = fase.Fase(self.director,'aire.xml')
+                    self.director.apilarEscena(escena)
+                elif Tierra.collidepoint(mouse_pos) :
+                    escena = escena = fase.Fase(self.director,'tierra.xml')
+                    self.director.apilarEscena(escena)
+                elif Woods.collidepoint(mouse_pos):
                     # prints current location of mouse
                     print('button was pressed at {0}'.format(mouse_pos))
 
