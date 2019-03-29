@@ -18,12 +18,9 @@
         <plataforma x="755" y="500" z="150"/>
 
 
-
-
-        <plataforma x="1155" y="950" z="100"/>
         <plataforma x="1155" y="875" z="100"/>
-        <plataforma x="1155" y="800" z="100"/>
-
+        <plataforma x="1155" y="780" z="100"/>
+        <plataforma x="1155" y="680" z="100"/>
 
         <plataforma x="1155" y="1000" z="500"/>
 
@@ -41,8 +38,8 @@
         <pared x="1355" y="510" z="800"/>
         <pared x="1655" y="0" z="505"/>
 
-        <pared x="1655" y="1000" z="2000"/>
-        <pared x="1955" y="1000" z="2000"/>
+        <pared x="1655" y="1005" z="2000"/>
+        <pared x="1955" y="1005" z="2000"/>
 
 
     </coordenadasParedes>
@@ -79,6 +76,8 @@
 
     <relleno x="1955" y="1000" z="300" k="355"/>
     <relleno x="1955" y="1355" z="300" k="355"/>
+
+    <relleno x="1355" y="505" z="300" k="300"/>
 
 
 

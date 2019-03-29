@@ -48,6 +48,9 @@ class Fase(Escena):
         self.fondo = parser_escena.decorado(self.xmldoc)
         self.decorado = Decorado(self.fondo)
 
+        self.test1 = UpgradeVida(50, 100)
+        self.test2 =  UpgradeDano(100, 100)
+        self.grupoUpgrade = pygame.sprite.Group(self.test1, self.test2)
         # Creamos los sprites de los jugadores
         self.jugador = Jugador(self.limite_inferior)
         self.jugador.keyUp_pulsada = False
@@ -87,7 +90,7 @@ class Fase(Escena):
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
         self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos)
         # Creamos otro grupo con todos los Sprites
-        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoSuelo)
+        self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoSuelo, self.grupoUpgrade)
         self.grupoBolasDeFuego = pygame.sprite.Group()
 
 
@@ -101,9 +104,13 @@ class Fase(Escena):
        return False
 
     def actualizarScrollVertical(self, jugador, tiempo):
-        if (jugador.rect.top <= ALTO_PANTALLA/2 or jugador.rect.bottom >= ALTO_PANTALLA/2):
+        if (jugador.rect.bottom >= ALTO_PANTALLA/2):
             self.scrolly =  self.scrolly + (jugador.velocidady * tiempo)
             return True
+        if (jugador.rect.top <= ALTO_PANTALLA/2 and self.scrolly > 0):
+            self.scrolly =  self.scrolly + (jugador.velocidady * tiempo)
+            return True
+
         return False
 
     def actualizarScroll(self, jugador, tiempo):

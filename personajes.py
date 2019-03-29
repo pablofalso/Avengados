@@ -712,7 +712,7 @@ class BolaDeFuego(MiSprite):
         # Lado hacia el que esta mirando
         self.jugador=jugador
         pygame.time.Clock()
-        self.clock = pygame.time.get_ticks() 
+        self.clock = pygame.time.get_ticks()
 
         if self.jugador.mirando == IZQUIERDA:
              self.velocidadx=-0.6
@@ -742,17 +742,119 @@ class BolaDeFuego(MiSprite):
     def actualizarPostura(self):
         if self.mirando == DERECHA:
             self.image = self.hoja.subsurface(self.coordenadasHoja)
-            
+
         #  Si no, si mira a la derecha, invertimos esa imagen
         else:
             self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
-                
+
 
     def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
-        
+
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
-        
+
         if pygame.time.get_ticks() - self.clock >= 800:
                 self.kill()
+        return
+
+
+class UpgradeVida(MiSprite):
+    "UpgradeVida"
+    def __init__(self, posicionx, posiciony):
+        # Primero invocamos al constructor de la clase padre
+        pygame.sprite.Sprite.__init__(self)
+        # Se carga la hoja
+        self.hoja = GestorRecursos.CargarImagen('MikeSprite.png',-1)
+        self.hoja = self.hoja.convert_alpha()
+        # El movimiento que esta realizando
+        self.movimiento = ATAQUE_DISTANCIA
+        # Lado hacia el que esta mirando
+        pygame.time.Clock()
+        self.clock = pygame.time.get_ticks()
+        self.velocidadx = 0
+        self.scroll=(0,0)
+        self.mirando = DERECHA
+        self.posicion = (posicionx, posiciony)
+        self.coordenadasHoja = [132, 3398, 32, 32]
+        # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
+        self.retardoMovimiento = 0
+
+        # La posicion inicial del Sprite
+        self.rect = pygame.Rect(posicionx, posiciony,self.coordenadasHoja[2],self.coordenadasHoja[3])
+
+        # La posicion x e y que ocupa
+
+        # Velocidad en el eje y (para los saltos)
+        #  En el eje x se utilizaria si hubiese algun tipo de inercia
+        self.velocidady = 0
+
+        # Y actualizamos la postura del Sprite inicial, llamando al metodo correspondiente
+        self.actualizarPostura()
+
+
+    def actualizarPostura(self):
+        if self.mirando == DERECHA:
+            self.image = self.hoja.subsurface(self.coordenadasHoja)
+
+        #  Si no, si mira a la derecha, invertimos esa imagen
+        else:
+            self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
+
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+
+        self.actualizarPostura()
+        MiSprite.update(self,tiempo)
+
+        if pygame.time.get_ticks() - self.clock >= 800:
+                self.kill()
+        return
+
+
+class UpgradeDano(MiSprite):
+    "UpgradeDaño"
+    def __init__(self, posicionx, posiciony):
+        # Primero invocamos al constructor de la clase padre
+        pygame.sprite.Sprite.__init__(self)
+        # Se carga la hoja
+        self.hoja = GestorRecursos.CargarImagen('MikeSprite.png',-1)
+        self.hoja = self.hoja.convert_alpha()
+        # El movimiento que esta realizando
+        self.movimiento = ATAQUE_DISTANCIA
+        # Lado hacia el que esta mirando
+        pygame.time.Clock()
+        self.clock = pygame.time.get_ticks()
+        self.mirando=DERECHA
+        self.velocidadx = 0
+        self.scroll=(0,0)
+        self.posicion = (posicionx, posiciony)
+        self.coordenadasHoja = [75, 3396, 38, 37]
+        # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
+        self.retardoMovimiento = 0
+
+        # La posicion inicial del Sprite
+        self.rect = pygame.Rect(posicionx, posiciony,self.coordenadasHoja[2],self.coordenadasHoja[3])
+
+        # La posicion x e y que ocupa
+
+        # Velocidad en el eje y (para los saltos)
+        #  En el eje x se utilizaria si hubiese algun tipo de inercia
+        self.velocidady = 0
+
+        # Y actualizamos la postura del Sprite inicial, llamando al metodo correspondiente
+        self.actualizarPostura()
+
+    def actualizarPostura(self):
+        if self.mirando == DERECHA:
+            self.image = self.hoja.subsurface(self.coordenadasHoja)
+
+        #  Si no, si mira a la derecha, invertimos esa imagen
+        else:
+            self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
+
+
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego):
+
+        self.actualizarPostura()
+        MiSprite.update(self,tiempo)
+
         return
