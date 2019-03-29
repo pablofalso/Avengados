@@ -22,6 +22,10 @@ def limites(xmldoc):
     res = xmldoc.getElementsByTagName("limitesMapa")
     return (int(res[0].attributes['x'].value),int(res[0].attributes['y'].value))
 
+def escala_jefe(xmldoc):
+    res = xmldoc.getElementsByTagName("Jefe")
+    return int(res[0].attributes['escala'].value)
+
 def listaCoordenadasPlataforma(xmldoc):
     res = xmldoc.getElementsByTagName('plataforma')
     lista = []

@@ -43,14 +43,12 @@ class Fase(Escena):
         self.xmldoc = parser_escena.parse(fullname)
         self.textura = parser_escena.texturas(self.xmldoc)
         self.limitex, self.limitey = parser_escena.limites(self.xmldoc)
-        self.limite_inferior = Plataforma([pygame.Rect(0, self.limitey, self.limitex, 5),self.limitex, 5], self.textura)
-        self.limite_derecha = Pared([pygame.Rect(self.limitex, 0, 5, self.limitey),5, self.limitey])
         self.fondo = parser_escena.decorado(self.xmldoc)
         self.decorado = Decorado(self.fondo)
 
 
         # Creamos los sprites de los jugadores
-        self.jugador = Jugador(self.limite_inferior)
+        self.jugador = Jugador(self.limitey)
         self.vida_act = self.jugador.hp
         self.jugador.keyUp_pulsada = False
         self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
@@ -97,11 +95,12 @@ class Fase(Escena):
 
         self.corazon_vida = UpgradeVida((30,10))
 
-
+        self.jefe = Jefe(parser_escena.escala_jefe(self.xmldoc))
+        self.jefe.establecerPosicion(parser_escena.coordenadasPersonaje('Jefe',self.xmldoc))
 
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
-        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos)
+        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos, self.jefe)
         # Creamos otro grupo con todos los Sprites
         self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoSuelo, self.grupoUpgradeVida, self.grupoUpgradeDano)
         self.grupoBolasDeFuego = pygame.sprite.Group()
@@ -156,6 +155,7 @@ class Fase(Escena):
             self.director.salirPrograma()
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)
+        self.jefe.mover(self.jugador)
         self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos, self.grupoBolasDeFuego,
         self.grupoUpgradeVida, self.grupoUpgradeDano)
         self.actualizarScroll(self.jugador, tiempo)
