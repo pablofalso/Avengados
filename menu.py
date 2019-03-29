@@ -20,6 +20,7 @@ class Menu(Escena):
 
     def eventos(self, lista_eventos):
         # Miramos a ver si hay algun evento de salir del programa
+
         Agua = pygame.Rect(299,127, 218, 56)
         Aire = pygame.Rect(299,223, 218, 56)
         Tierra = pygame.Rect(299,311, 218, 56)
@@ -27,22 +28,32 @@ class Menu(Escena):
             Woods = pygame.Rect(299,407,218, 56)
             self.decorado = Decorado(self.director)
         for evento in lista_eventos:
-            # Si se quiere salir, se le indica al director
+            # Si se quiere salir, se le indica al directo
             if evento.type == pygame.QUIT:
                 self.director.salirPrograma()
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = evento.pos
                 if Agua.collidepoint(mouse_pos):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load('Musica/temploAgua.mp3')
+                    pygame.mixer.music.play(-1)
                     escena = escena = fase.Fase(self.director,'agua.xml')
                     self.director.apilarEscena(escena)
                 elif Aire.collidepoint(mouse_pos) :
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load('Musica/temploAire.mp3')
+                    pygame.mixer.music.play(-1)
                     escena = escena = fase.Fase(self.director,'aire.xml')
                     self.director.apilarEscena(escena)
                 elif Tierra.collidepoint(mouse_pos) :
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load('Musica/temploTierra.mp3')
+                    pygame.mixer.music.play(-1)
                     escena = escena = fase.Fase(self.director,'tierra.xml')
                     self.director.apilarEscena(escena)
                 elif Woods.collidepoint(mouse_pos):
                     if self.director.orbes >= 3 and  self.director.agua and self.director.aire and self.director.tierra:
+                        pygame.mixer.music.stop()
                         escena = escena = fase.Fase(self.director,'kriss.xml')
                         self.director.apilarEscena(escena)
 

@@ -847,6 +847,7 @@ class Kriss(MiSprite):
                 self.numImagenPostura = 0
                 if self.numPostura == SPRITE_LINK_MUERTO:
                     self.kill()
+                    pygame.quit()
             if self.numImagenPostura < 0:
                 self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
             self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])

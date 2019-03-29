@@ -21,7 +21,6 @@ class Titulo(Escena):
     def eventos(self, lista_eventos):
         # Miramos a ver si hay algun evento de salir del programa
         NuevaPartida = pygame.Rect(159,265, 383, 38)
-        Continuar = pygame.Rect(159,352, 383, 38)
         SalirDelJuego = pygame.Rect(159,440, 383, 38)
         for evento in lista_eventos:
             # Si se quiere salir, se le indica al director
@@ -30,11 +29,8 @@ class Titulo(Escena):
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = evento.pos
                 if NuevaPartida.collidepoint(mouse_pos):
-
                     escena = Menu(self.director)
                     self.director.apilarEscena(escena)
-                elif Continuar.collidepoint(mouse_pos):
-                    print("HOLA")
                 elif SalirDelJuego.collidepoint(mouse_pos):
                     self.director.salirPrograma()
 
