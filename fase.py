@@ -5,6 +5,7 @@ from escena import *
 from personajes import *
 from pygame.locals import *
 import parser_escena
+import menu
 # -------------------------------------------------
 # -------------------------------------------------
 # Constantes
@@ -141,7 +142,7 @@ class Fase(Escena):
 
     def update(self,tiempo, pantalla):
         if (self.jugador.posicion[0] <= -50):
-            escena = Fase(self.director,'aire.xml')
+            escena = menu.Menu(self.director)
             self.director.apilarEscena(escena)
         if (self.jugador.movimiento == ATAQUE_DISTANCIA and self.jugador.fuego):
             bola = BolaDeFuego(self.jugador, self.jugador.posicion[0], self.jugador.posicion[1]-15)
@@ -156,7 +157,7 @@ class Fase(Escena):
         if self.jugador.hp <= 0:
             pantalla.fill((0,0,0))
             pygame.time.wait(100)
-            escena = Fase(self.director,self.xml)
+            escena = Fase(self.director, self.xml)
             self.director.apilarEscena(escena)
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)
