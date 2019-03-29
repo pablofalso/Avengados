@@ -11,7 +11,8 @@
         <Kriss x="100" y="300"/>
         <EnemigoComun x="670" y="355"/>
         <EnemigoComun x="2050" y="255"/>
-        <Jefe x="2950" y="305" escala="1"/>
+        <Jefe x="2950" y="305" escala="2"/>
+        <Kriss x="100" y="300"/>
     </coordenadasPersonajes>
 
     <coordenadasPlataformas>
