@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+    <decorado name="backgroundAire.png"/>
+    <texturas name="texturaAire.png"/>
+    <limitesMapa x="2150" y="700"/>
+
+    <coordenadasPersonajes>
+        <Mike x="0" y="300"/>
+        <Kriss x="600" y="300"/>
+    </coordenadasPersonajes>
+
+    <coordenadasPlataformas>
+
+        <plataforma x="0" y="300" z="1000"/>
+
+    </coordenadasPlataformas>
+
+
+</data>

@@ -46,13 +46,17 @@ class Fase(Escena):
         self.limitex, self.limitey = parser_escena.limites(self.xmldoc)
         self.fondo = parser_escena.decorado(self.xmldoc)
         self.decorado = Decorado(self.fondo)
-
-
+        self.grupoOrbe = pygame.sprite.Group()
+        self.killed = True
         # Creamos los sprites de los jugadores
         self.jugador = Jugador(self.limitey)
         self.vida_act = self.jugador.hp
         self.jugador.keyUp_pulsada = False
         self.jugador.establecerPosicion(parser_escena.coordenadasPersonaje('Mike',self.xmldoc))
+        self.jugador.hp = self.director.vida
+        self.jugador.dano_max = self.director.ataque
+        self.jugador.dash_des = self.director.dash
+        self.jugador.salto_des = self.director.doble_salto
 
         # Creamos las plataformas
         listaPlataformas = parser_escena.listaCoordenadasPlataforma(self.xmldoc)
@@ -92,20 +96,22 @@ class Fase(Escena):
         listaUpgradesDano = parser_escena.coordenadasUpgrades('daño', self.xmldoc)
         self.grupoUpgradeDano = pygame.sprite.Group()
         for coordenadas in listaUpgradesDano:
-            self.grupoUpgradeDano.add(UpgradedeDano(coordenadas))
-
+            self.grupoUpgradeDano.add(UpgradeDano(coordenadas))
         self.corazon_vida = UpgradeVida((30,10))
+        if (parser_escena.escala_jefe(self.xmldoc) != None):
+            self.jefe = Jefe(parser_escena.escala_jefe(self.xmldoc))
+            self.jefe.establecerPosicion(parser_escena.coordenadasPersonaje('Jefe',self.xmldoc))
+            self.grupoEnemigos.add(self.jefe)
+            self.jefeG = pygame.sprite.Group()
+            self.jefeG.add(self.jefe)
 
-        self.jefe = Jefe(parser_escena.escala_jefe(self.xmldoc))
-        self.jefe.establecerPosicion(parser_escena.coordenadasPersonaje('Jefe',self.xmldoc))
-        self.grupoEnemigos.add(self.jefe)
-
-        #self.kriss = Kriss()
-        #self.kriss.establecerPosicion(parser_escena.coordenadasPersonaje('Kriss',self.xmldoc))
-        #self.grupoEnemigos.add(self.kriss)
+        self.kriss = Kriss()
+        if (parser_escena.coordenadasPersonaje('Kriss',self.xmldoc) != None):
+            self.kriss.establecerPosicion(parser_escena.coordenadasPersonaje('Kriss',self.xmldoc))
+            self.grupoEnemigos.add(self.kriss)
         # Creamos un grupo con los Sprites que se mueven
         #  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
-        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos, self.jefe)
+        self.grupoSpritesDinamicos = pygame.sprite.Group(self.jugador, self.grupoEnemigos)
         # Creamos otro grupo con todos los Sprites
         self.grupoSprites = pygame.sprite.Group(self.grupoSpritesDinamicos, self.grupoPlataformas, self.grupoParedes, self.grupoSuelo, self.grupoUpgradeVida, self.grupoUpgradeDano)
         self.grupoBolasDeFuego = pygame.sprite.Group()
@@ -134,7 +140,6 @@ class Fase(Escena):
     def actualizarScroll(self, jugador, tiempo):
         cambioScrollH = self.actualizarScrollHorizontal(jugador, tiempo)
         cambioScrollV = self.actualizarScrollVertical(jugador, tiempo)
-
         # Si se cambio el scroll, se desplazan todos los Sprites y el decorado
         if cambioScrollH or cambioScrollV:
             # Actualizamos la posición en pantalla de todos los Sprites según el scroll actual
@@ -145,6 +150,16 @@ class Fase(Escena):
             #self.decorado.update(self.scrollx)
 
     def update(self,tiempo, pantalla):
+        if (parser_escena.escala_jefe(self.xmldoc) != None):
+            if not self.jefe.alive() and self.killed:
+                self.orbe = Orbe((self.jugador.posicion[0] -100 , self.jugador.posicion[1]-5))
+                self.grupoSprites.add(self.orbe)
+                self.grupoOrbe.add (self.orbe)
+                self.killed = False
+        self.director.vida = self.jugador.hp_max
+        self.director.ataque = self.jugador.dano_max
+        self.jugador.dash_des = self.director.dash
+        self.jugador.salto_des = self.director.doble_salto
         if (self.jugador.posicion[0] <= -50):
             escena = menu.Menu(self.director)
             self.director.apilarEscena(escena)
@@ -154,6 +169,18 @@ class Fase(Escena):
             self.jugador.fuego = False
             self.grupoSprites.add(bola)
             self.grupoSpritesDinamicos.add(bola)
+        orbe_check = pygame.sprite.spritecollideany(self.jugador, self.grupoOrbe)
+        if (orbe_check != None):
+            self.director.orbes+=1
+            if (self.xml == 'agua.xml'):
+                self.director.dash = True
+                self.director.agua = True
+            elif (self.xml == 'aire.xml'):
+                self.director.doble_salto = True
+                self.director.aire = True
+            elif (self.xml == 'tierra.xml'):
+                self.director.tierra = True
+            self.orbe.kill()
         # Actualizamos los Sprites dinamicos
         # De esta forma, se simula que cambian todos a la vez
         # Esta operación de update ya comprueba que los movimientos sean correctos
@@ -166,7 +193,7 @@ class Fase(Escena):
         for enemigo in iter(self.grupoEnemigos):
             enemigo.mover(self.jugador)
         self.grupoSpritesDinamicos.update(tiempo, self.grupoPlataformas, self.grupoParedes, self.grupoEnemigos, self.grupoBolasDeFuego,
-        self.grupoUpgradeVida, self.grupoUpgradeDano)
+        self.grupoUpgradeVida, self.grupoUpgradeDano, self.limitex)
         self.actualizarScroll(self.jugador, tiempo)
         # Dentro del update ya se comprueba que todos los movimientos son válidos
         #  (que no choque con paredes, etc.)

@@ -7,6 +7,7 @@ import director
 from director import Director
 from fase import Fase
 from menu import Menu
+from titulo import Titulo
 
 if __name__ == '__main__':
     pygame.font.init()
@@ -15,7 +16,14 @@ if __name__ == '__main__':
     # Creamos el director
     director = Director()
     # Creamos la escena con la pantalla inicial
+
     escena = Menu(director)
+
+
+    #escena = Fase(director,'agua.xml')
+    escena = Titulo(director)
+
+
     # Le decimos al director que apile esta escena
     director.apilarEscena(escena)
     # Y ejecutamos el juego

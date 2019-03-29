@@ -10,7 +10,7 @@ import fase
 class Menu(Escena):
     def __init__(self, director):
         Escena.__init__(self, director)
-        self.decorado = Decorado()
+        self.decorado = Decorado(director)
 
     def update(self, *args):
         return
@@ -23,7 +23,9 @@ class Menu(Escena):
         Agua = pygame.Rect(299,127, 218, 56)
         Aire = pygame.Rect(299,223, 218, 56)
         Tierra = pygame.Rect(299,311, 218, 56)
-        Woods = pygame.Rect(299,407,218, 56)
+        if (self.director.orbes >= 3):
+            Woods = pygame.Rect(299,407,218, 56)
+            self.decorado = Decorado(self.director)
         for evento in lista_eventos:
             # Si se quiere salir, se le indica al director
             if evento.type == pygame.QUIT:
@@ -40,8 +42,10 @@ class Menu(Escena):
                     escena = escena = fase.Fase(self.director,'tierra.xml')
                     self.director.apilarEscena(escena)
                 elif Woods.collidepoint(mouse_pos):
-                    # prints current location of mouse
-                    print('button was pressed at {0}'.format(mouse_pos))
+                    if self.director.orbes >= 3 and  self.director.agua and self.director.aire and self.director.tierra:
+                        escena = escena = fase.Fase(self.director,'kriss.xml')
+                        self.director.apilarEscena(escena)
+
 
     def on_close(self):
         self.director.salirPrograma()
@@ -55,8 +59,11 @@ class Menu(Escena):
 
 
 class Decorado:
-    def __init__(self):
-        self.imagen = GestorRecursos.CargarImagen('menu.png', -1)
+    def __init__(self, director):
+        if(director.orbes < 3):
+            self.imagen = GestorRecursos.CargarImagen('menu1.png', -1)
+        else:
+            self.imagen = GestorRecursos.CargarImagen('menu.png', -1)
         self.imagen = pygame.transform.scale(self.imagen, (800, 600))
 
         self.rect = self.imagen.get_rect()

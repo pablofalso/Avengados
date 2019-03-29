@@ -2,13 +2,13 @@
 <data>
     <decorado name="backgroundAire.png"/>
     <texturas name="texturaAire.png"/>
-    <limitesMapa x="2150" y="700"/>
+    <limitesMapa x="2600" y="700"/>
 
     <coordenadasPersonajes>
         <Mike x="0" y="450"/>
         <EnemigoComun x="1130" y="205"/>
         <EnemigoComun x="1170" y="-270"/>
-        <Jefe x="1675" y="-645" escala="2"/>
+        <Jefe x="2200" y="-645" escala="2"/>
     </coordenadasPersonajes>
 
     <coordenadasPlataformas>
@@ -37,7 +37,7 @@
         <plataforma x="1400" y="-650" z="100"/>
         <plataforma x="1600" y="-650" z="200"/>
 
-        <plataforma x="1800" y="-520" z="150"/>
+        <plataforma x="1800" y="-520" z="1000"/>
 
 
 
@@ -48,7 +48,7 @@
       <pared x="300" y="355" z="800"/>
       <pared x="900" y="205" z="600"/>
 
-      <pared x="1450" y="-275" z="-50"/>
+      <pared x="1450" y="-270" z="-50"/>
       <pared x="950" y="-270" z="-185"/>
       <pared x="950" y="-95" z="-50"/>
       <pared x="1600" y="-645" z="200"/>
@@ -103,7 +103,8 @@
   </coordenadasRelleno>
 
   <coordenadasUpgradeVida>
-      <vida x="1544" y="205" />
       <vida x="40" y="-5"/>
     </coordenadasUpgradeVida>
+
+
 </data>

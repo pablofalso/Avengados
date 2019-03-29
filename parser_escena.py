@@ -8,7 +8,10 @@ def parse(fullname):
 
 def coordenadasPersonaje(tag, xmldoc):
     res =  xmldoc.getElementsByTagName(tag)
-    return (int(res[0].attributes['x'].value),int(res[0].attributes['y'].value))
+    if res == []:
+        return None
+    else:
+        return (int(res[0].attributes['x'].value),int(res[0].attributes['y'].value))
 
 def decorado(xmldoc):
     res =  xmldoc.getElementsByTagName("decorado")
@@ -24,7 +27,10 @@ def limites(xmldoc):
 
 def escala_jefe(xmldoc):
     res = xmldoc.getElementsByTagName("Jefe")
-    return int(res[0].attributes['escala'].value)
+    if res == []:
+        return None
+    else:
+        return int(res[0].attributes['escala'].value)
 
 def listaCoordenadasPlataforma(xmldoc):
     res = xmldoc.getElementsByTagName('plataforma')

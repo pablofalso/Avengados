@@ -137,7 +137,8 @@ class Jugador(MiSprite):
         self.dasheando = False
         self.velocidadx = 0
         self.scroll=(0,0)
-
+        self.dash_des = False
+        self.salto_des = False
         self.hp_max = HP
         self.dano_max = 1
         # Leemos las coordenadas de un archivo de texto
@@ -254,9 +255,7 @@ class Jugador(MiSprite):
                     self.movimiento = ATAQUE
                     self.atacando = True
             elif teclasPulsadas[dash]:
-                if self.dash_desbloqueado:
-                    # Si estás en el aire, no puedes dashear
-                    #if not(self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO):
+                if self.dash_desbloqueado and self.dash_des:
                     if pygame.time.get_ticks() - self.inicio_dash > CD_DASH:
                         self.movimiento = DASH
                         self.dasheando = True
@@ -272,7 +271,7 @@ class Jugador(MiSprite):
                     # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
                     # y solo se ha realizado un salto sin tocar el suelo
 
-                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto) and self.salto_des :
                         self.movimiento = ARRIBA
                         self.dobleSalto_segundoSalto = True
                     else:
@@ -285,7 +284,7 @@ class Jugador(MiSprite):
                 if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
                     # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
                     # y solo se ha realizado un salto sin tocar el suelo
-                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto) and self.salto_des:
                         self.movimiento = ARRIBA
                         self.dobleSalto_segundoSalto = True
                     else:
@@ -299,7 +298,7 @@ class Jugador(MiSprite):
                 if self.numPostura == SPRITE_SALTANDO_SUBIENDO or self.numPostura == SPRITE_SALTANDO_BAJANDO:
                     # Si el doble salto esta desbloqueado, se ha soltado la tecla de saltar y vuelto a pulsar
                     # y solo se ha realizado un salto sin tocar el suelo
-                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto):
+                    if self.dobleSalto_desbloqueado and self.keyUp_suelta and (not self.dobleSalto_segundoSalto) and self.salto_des:
                         self.movimiento = ARRIBA
                         self.dobleSalto_segundoSalto = True
                     else:
@@ -316,7 +315,7 @@ class Jugador(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano, maxX):
         if self.movimiento == MUERTO:
             self.actualizarPostura()
             MiSprite.update(self,tiempo)
@@ -347,8 +346,8 @@ class Jugador(MiSprite):
                         self.hp -= enemigo.daño
             if (self.movimiento == ATAQUE):
                 enemigo.hp -= self.dano_max
-        if self.posicion[0] > 3200:
-            self.establecerPosicion((3200, self.posicion[1]))
+        if self.posicion[0] > maxX:
+            self.establecerPosicion((maxX, self.posicion[1]))
         plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
         pared  = pygame.sprite.spritecollideany(self, grupoParedes)
         #Primero se mira si está encima de una plataforma, si no está cae
@@ -547,7 +546,7 @@ class Enemigo(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano, maxX):
         if not self.movimiento == ENEMIGO_MUERTO:
             plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
             pared = pygame.sprite.spritecollideany(self, grupoParedes)
@@ -729,7 +728,7 @@ class Jefe(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano, maxX):
         if not self.movimiento == ENEMIGO_MUERTO:
             plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
             pared = pygame.sprite.spritecollideany(self, grupoParedes)
@@ -913,7 +912,7 @@ class Kriss(MiSprite):
 
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano, maxX):
         if not self.movimiento == LINK_MUERTO:
             bola = pygame.sprite.spritecollideany(self,grupoBolasDeFuego)
             #Primero se mira si está encima de una plataforma, si no está cae
@@ -992,7 +991,7 @@ class BolaDeFuego(MiSprite):
             self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
 
 
-    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano, maxX):
 
         self.actualizarPostura()
         MiSprite.update(self,tiempo)
@@ -1060,7 +1059,7 @@ class UpgradeVida(MiSprite):
 
 class UpgradeDano(MiSprite):
     "UpgradeDaño"
-    def __init__(self, posicionx, posiciony):
+    def __init__(self, coordenadas):
         # Primero invocamos al constructor de la clase padre
         pygame.sprite.Sprite.__init__(self)
         # Se carga la hoja
@@ -1070,17 +1069,66 @@ class UpgradeDano(MiSprite):
         self.movimiento = ATAQUE_DISTANCIA
         # Lado hacia el que esta mirando
         pygame.time.Clock()
+        self.posicion = coordenadas
         self.clock = pygame.time.get_ticks()
         self.mirando=DERECHA
         self.velocidadx = 0
         self.scroll=(0,0)
-        self.posicion = (posicionx, posiciony)
         self.coordenadasHoja = [75, 3396, 38, 37]
         # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
         self.retardoMovimiento = 0
 
         # La posicion inicial del Sprite
-        self.rect = pygame.Rect(posicionx, posiciony,self.coordenadasHoja[2],self.coordenadasHoja[3])
+        self.rect = pygame.Rect(self.posicion[0], self.posicion[1], self.coordenadasHoja[2],self.coordenadasHoja[3])
+
+        # La posicion x e y que ocupa
+
+        # Velocidad en el eje y (para los saltos)
+        #  En el eje x se utilizaria si hubiese algun tipo de inercia
+        self.velocidady = 0
+
+        # Y actualizamos la postura del Sprite inicial, llamando al metodo correspondiente
+        self.actualizarPostura()
+
+    def actualizarPostura(self):
+        if self.mirando == DERECHA:
+            self.image = self.hoja.subsurface(self.coordenadasHoja)
+
+        #  Si no, si mira a la derecha, invertimos esa imagen
+        else:
+            self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja), 1, 0)
+
+
+    def update(self, tiempo, grupoPlataformas, grupoParedes, grupoEnemigos, grupoBolasDeFuego, grupoUpgradeVida, grupoUpgradedeDano):
+
+        self.actualizarPostura()
+        MiSprite.update(self,tiempo)
+
+        return
+
+class Orbe(MiSprite):
+    "Orbe"
+    def __init__(self, coordenadas):
+        # Primero invocamos al constructor de la clase padre
+        pygame.sprite.Sprite.__init__(self)
+        # Se carga la hoja
+        self.hoja = GestorRecursos.CargarImagen('MikeSprite.png',-1)
+        self.hoja = self.hoja.convert_alpha()
+        # El movimiento que esta realizando
+        self.movimiento = ATAQUE_DISTANCIA
+        # Lado hacia el que esta mirando
+        pygame.time.Clock()
+        self.posicion = coordenadas
+        self.clock = pygame.time.get_ticks()
+        self.mirando=DERECHA
+        self.velocidadx = 0
+        self.scroll=(0,0)
+        self.coordenadasHoja = [371, 3382, 77, 66]
+        # El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
+        self.retardoMovimiento = 0
+
+        # La posicion inicial del Sprite
+        self.rect = pygame.Rect(self.posicion[0], self.posicion[1], self.coordenadasHoja[2],self.coordenadasHoja[3])
 
         # La posicion x e y que ocupa
 

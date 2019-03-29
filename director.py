@@ -23,6 +23,14 @@ class Director():
         self.salir_escena = False
         # Reloj
         self.reloj = pygame.time.Clock()
+        self.orbes = 0
+        self.vida = 3
+        self.ataque = 1
+        self.dash = False
+        self.doble_salto = False
+        self.tierra = False
+        self.agua = False
+        self.aire = False
 
 
     def bucle(self, escena):

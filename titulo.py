@@ -5,6 +5,7 @@ from escena import *
 from personajes import *
 from pygame.locals import *
 import parser_escena
+from menu import Menu
 
 class Titulo(Escena):
     def __init__(self, director):
@@ -28,9 +29,14 @@ class Titulo(Escena):
                 self.director.salirPrograma()
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = evento.pos
-                if NuevaPartida.collidepoint(mouse_pos) or Continuar.collidepoint(mouse_pos) or SalirDelJuego.collidepoint(mouse_pos):
-                    # prints current location of mouse
-                    print('button was pressed at {0}'.format(mouse_pos))
+                if NuevaPartida.collidepoint(mouse_pos):
+
+                    escena = Menu(self.director)
+                    self.director.apilarEscena(escena)
+                elif Continuar.collidepoint(mouse_pos):
+                    print("HOLA")
+                elif SalirDelJuego.collidepoint(mouse_pos):
+                    self.director.salirPrograma()
 
     def on_close(self):
         self.director.salirPrograma()
